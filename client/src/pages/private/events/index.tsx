@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Card, Button, Modal, Popconfirm, Row, Col } from "antd";
 import { Events } from "../../../types";
@@ -36,6 +35,9 @@ export const EventsPage: React.FC = () => {
               title={event.eventName}
               bordered={true}
               actions={[
+                <Button type="link" onClick={() => showModal(event)}>
+                  View
+                </Button>,
                 <Button type="link" onClick={() => showModal(event)}>
                   Edit
                 </Button>,
