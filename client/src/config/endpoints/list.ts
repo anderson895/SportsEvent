@@ -14,6 +14,7 @@ const Api = {
   EVENTS:(base = '/events') => ({
     LIST: ApiEndpoint(base + '/list'),
     ADD: ApiEndpoint(base + '/add'),
+    INFO: ApiEndpoint(base + '/information'),
     EDIT: ApiEndpoint(base + '/edit'),
     DELETE: ApiEndpoint(base + '/delete'),
   }),

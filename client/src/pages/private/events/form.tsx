@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, DatePicker, Form, FormInstance, Input } from 'antd';
 import { Events } from '../../../types';
+import CustomTextEditor from '../../../components/inputs/customEditor';
 
 interface EventsFormProps {
   form: FormInstance;
@@ -48,6 +49,9 @@ const EventsForm: React.FC<EventsFormProps> = ({
         <DatePicker className='w-full' />
       </Form.Item>
       </div>
+      <Form.Item label='Description' name='description'>
+        <CustomTextEditor />
+      </Form.Item>
       <Form.Item>
         <Button loading={loading} type="primary" htmlType="submit">
           {editingEvents ? 'Update' : 'Add'}

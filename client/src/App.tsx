@@ -3,6 +3,7 @@ import './App.css'
 import { RouterUrl } from './routes'
 import { Private, Public } from './layout'
 import { AdminDashboard, EventsPage, LandingPage, LoginPage, RegistrationPage, SportsPage, TeamsPage } from './pages'
+import EventInformation from './pages/private/events/information'
 
 function App() {
   const router = createBrowserRouter([
@@ -23,6 +24,7 @@ function App() {
         { path: RouterUrl.AdminTeams, element: <TeamsPage /> },
         { path: RouterUrl.AdminEvents, element: <EventsPage /> },
         { path: RouterUrl.AdminSports, element: <SportsPage /> },
+        { path: RouterUrl.EventInfo, element: <EventInformation /> },
       ]
     }
   ]);

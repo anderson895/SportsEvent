@@ -26,6 +26,7 @@ export default function useEventsHooks() {
   const handleAddOrEditEvent = (values: Events) => {
     const formData = new FormData();
     formData.append("eventName", values.eventName);
+    formData.append("description", values.description);
     formData.append("eventYear", new Date().getFullYear.toString());
     formData.append("eventstartDate", new Date(values.eventstartDate).toISOString());
     formData.append("eventendDate", new Date(values.eventendDate).toISOString());

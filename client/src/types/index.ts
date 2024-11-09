@@ -11,6 +11,7 @@ export interface Events {
     eventYear: string;
     eventendDate: any; 
     eventstartDate: any; 
+    description:string;
   }
 export interface Sports {
     sportsId: number;

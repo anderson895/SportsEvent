@@ -4,8 +4,10 @@ import { Events } from "../../../types";
 import TeamsForm from "./form";
 import useEventsHooks from "./useEventsHooks";
 import { dateFormatter } from "../../../utility/utils";
+import { useNavigate } from "react-router-dom";
 
 export const EventsPage: React.FC = () => {
+  const navigate = useNavigate()
   const {
     Events,
     isModalVisible,
@@ -35,7 +37,7 @@ export const EventsPage: React.FC = () => {
               title={event.eventName}
               bordered={true}
               actions={[
-                <Button type="link" onClick={() => showModal(event)}>
+                <Button type="link" onClick={() => navigate(`/Events/${event.eventId}`)}>
                   View
                 </Button>,
                 <Button type="link" onClick={() => showModal(event)}>
@@ -55,6 +57,7 @@ export const EventsPage: React.FC = () => {
             >
               <p><strong>Start Date:</strong> {dateFormatter(event.eventstartDate)}</p>
               <p><strong>End Date:</strong> {dateFormatter(event.eventendDate)}</p>
+              <div dangerouslySetInnerHTML={{__html:event.description}} />
             </Card>
           </Col>
         ))}

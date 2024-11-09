@@ -1,6 +1,6 @@
 const { errorException } = require("../../helpers/errorException");
 const { handleResponse } = require("../../helpers/handleResponse");
-const { createEvents, fetchEvents, editEvent, deleteEvent } = require("./events.services");
+const { createEvents, fetchEvents, editEvent, deleteEvent, fetchEventById, addSportsEvents } = require("./events.services");
 
 
 module.exports = {
@@ -35,4 +35,21 @@ module.exports = {
             errorException(error,res)
         }
     },
+
+    EventInfo:(req,res) =>{
+        try {
+            const data = req.params.eventId;
+            handleResponse(res,fetchEventById(data))
+        } catch (error) {
+            errorException(error,res)
+        }
+    },
+    SportsEvents:(req,res) =>{
+        try {
+            const data = req.body;
+            handleResponse(res,addSportsEvents(data))
+        } catch (error) {
+            errorException(error,res)
+        }
+    }
 }
