@@ -9,7 +9,7 @@ const executeOnProcess = async (callback: any) =>
   });
 
 const dateFormatter = (date: any) => moment(date).format('MMMM DD, YYYY');
-const dateStringFormatter = (date: any) => moment(date).format('MMMM DD, YYYY');
+const dateStringFormatter = (date: any) => moment(date).format('MMMM DD, YYYY hh:mm A');
 const timeFormatter = (datetimeString:any) => {
   return moment(datetimeString).format('hh:mm A')};
 

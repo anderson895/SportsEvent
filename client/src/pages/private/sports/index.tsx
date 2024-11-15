@@ -18,7 +18,7 @@ export const SportsPage: React.FC = () => {
     form,
     loading
   } = useTeamsHooks();
-
+  console.log(Sports)
   return (
     <div>
       <Button
@@ -32,7 +32,7 @@ export const SportsPage: React.FC = () => {
 
       {/* Grid layout for displaying cards */}
       <Row gutter={[16, 16]}>
-        {Sports?.data?.results?.map((sport: Sports) => (
+        {Sports?.map((sport: Sports) => (
           <Col xs={24} sm={12} md={8} lg={6} key={sport.sportsId}>
             <Card
               hoverable

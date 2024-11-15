@@ -20,9 +20,9 @@ export default function useSportsHooks() {
 
   const { data: Sports, isPending: isFetchingSports } = useFetchData(
     ["Sports"],
-    () => SportsServices.fetchSports()
+    [() => SportsServices.fetchSports()]
   );
-
+  console.log(Sports)
   const handleAddOrEditTeam = (values: Sports) => {
     const formData = new FormData();
     if (!isImageUpdated && editingSports?.sportsLogo) {

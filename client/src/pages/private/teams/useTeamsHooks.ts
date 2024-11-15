@@ -20,7 +20,7 @@ export default function useTeamsHooks() {
 
   const { data: teams, isPending: isFetchingTeams } = useFetchData(
     ["teams"],
-    () => TeamsServices.fetchTeams()
+    [() => TeamsServices.fetchTeams()]
   );
 
   const handleAddOrEditTeam = (values: Team) => {

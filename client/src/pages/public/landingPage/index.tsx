@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Button, Card, Menu } from "antd";
+import { useRef } from "react";
+import { Button, Card } from "antd";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -325,7 +325,7 @@ export const LandingPage = () => {
 
           {/* Thumbnails Swiper */}
           <Swiper
-            onSwiper={(swiper) => (thumbsSwiperRef.current = swiper)} // Set the Swiper instance for thumbnails
+            onSwiper={(swiper) => (thumbsSwiperRef.current = swiper)}
             spaceBetween={10}
             slidesPerView={4}
             freeMode={true}

@@ -17,12 +17,13 @@ export default function useEventsHooks() {
     useEventsRequest({
       setIsModalVisible,
     });
-
-  const { data: Events, isPending: isFetchingEvents } = useFetchData(
+  const { data: Events, isLoading: isFetchingEvents } = useFetchData(
     ["Events"],
-    () => EventsServices.fetchEvents()
+    [
+      () => EventsServices.fetchEvents(),
+    ]
   );
-
+  console.log(Events)
   const handleAddOrEditEvent = (values: Events) => {
     const formData = new FormData();
     formData.append("eventName", values.eventName);

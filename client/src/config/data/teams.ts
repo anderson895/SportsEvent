@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { notification } from "antd";
@@ -9,39 +10,52 @@ interface UseTeamsRequestProps {
 }
 
 export default function useTeamsRequest({ setIsModalVisible }: UseTeamsRequestProps) {
+  const notify = (type: "success" | "error", message: string, description?: string) => {
+    notification[type]({ message, description });
+  };
+
   const handleSuccess = (message: string) => {
     setIsModalVisible(false);
-    notification.success({ message });
+    notify("success", message);
   };
 
   const handleError = (error: any) => {
-    console.log(error);
-    notification.error({
-      message: "Action failed",
-      description: error.message || "An unexpected error occurred.",
-    });
+    console.error(error);
+    notify("error", "Action failed", error.message || "An unexpected error occurred.");
   };
 
   const onSuccessHandler = (response: any, successMessage: string) => {
     response.data.success === 0 ? handleError(response.data) : handleSuccess(successMessage);
   };
 
-  const { mutate: addTeamMutation, isPending: isAddingTeam } = useRequestData(
-    (formData: FormData) => TeamsServices.addTeams(formData),
-    { onSuccess: (response) => onSuccessHandler(response, "Successfully added new team"), onError: handleError }
+  const createMutation = (serviceMethod: (data: any) => Promise<any>, successMessage: string) => {
+    return useRequestData(serviceMethod, {
+      onSuccess: (response) => onSuccessHandler(response, successMessage),
+      onError: handleError,
+    });
+  };
+
+  const { mutate: addTeamMutation, isPending: isAddingTeam } = createMutation(
+    TeamsServices.addTeams,
+    "Successfully added new team"
   );
 
-  const { mutate: editTeamMutation, isPending: isEditingTeam } = useRequestData(
-    (formData: FormData) => TeamsServices.editTeams(formData),
-    { onSuccess: (response) => onSuccessHandler(response, "Successfully updated team info"), onError: handleError }
+  const { mutate: editTeamMutation, isPending: isEditingTeam } = createMutation(
+    TeamsServices.editTeams,
+    "Successfully updated team info"
   );
 
-  const { mutate: deleteTeamMutation, isPending: isDeletingTeam } = useRequestData(
-    (teamId: any) => TeamsServices.deleteTeams(teamId),
-    { onSuccess: (response) => onSuccessHandler(response, "Successfully deleted team"), onError: handleError }
+  const { mutate: deleteTeamMutation, isPending: isDeletingTeam } = createMutation(
+    TeamsServices.deleteTeams,
+    "Successfully deleted team"
   );
 
-  const isLoading = isAddingTeam || isEditingTeam || isDeletingTeam;
+  const isLoading = [isAddingTeam, isEditingTeam, isDeletingTeam].some(Boolean);
 
-  return { isLoading, addTeamMutation, editTeamMutation, deleteTeamMutation };
+  return {
+    isLoading,
+    addTeamMutation,
+    editTeamMutation,
+    deleteTeamMutation,
+  };
 }

@@ -3,27 +3,26 @@ import useStore from "../zustand/store/store";
 import { selector } from "../zustand/store/store.provider";
 import { RouterUrl } from "../routes";
 import { Layout, Menu, Breadcrumb } from "antd";
-import {
-  DashboardOutlined,
-  CalendarOutlined,
-  TeamOutlined,
-  TrophyOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { TbScoreboard } from "react-icons/tb";
+import { MdManageAccounts } from "react-icons/md";
+import { MdDashboard } from "react-icons/md";
+import { RiTeamFill } from "react-icons/ri";
 import { TbTimelineEventText, TbOlympics } from "react-icons/tb";
 import { Outlet } from "react-router-dom";
+import { GrSchedules } from "react-icons/gr";
+import { FaTrophy } from "react-icons/fa";
 
 const { Header, Content, Sider } = Layout;
 
 const menuItems = [
-  { key: "dashboard", icon: <DashboardOutlined />, label: "Dashboard", path: RouterUrl.AdminDashboard },
-  { key: "sports", icon: <TbOlympics />, label: "Sports", path: RouterUrl.AdminSports },
-  { key: "events", icon: <TbTimelineEventText />, label: "Events", path: RouterUrl.AdminEvents },
-  { key: "teams", icon: <TeamOutlined />, label: "Teams", path: RouterUrl.AdminTeams },
-  { key: "schedule", icon: <CalendarOutlined />, label: "Game Schedule", path: "/schedule" },
-  { key: "match-making", icon: <TeamOutlined />, label: "Match Making", path: "/match-making" },
-  { key: "results", icon: <TrophyOutlined />, label: "Results", path: "/results" },
-  { key: "settings", icon: <SettingOutlined />, label: "Settings", path: "/settings" },
+  { key: "dashboard", icon: <MdDashboard size={25} />, label: "Dashboard", path: RouterUrl.AdminDashboard },
+  { key: "sports", icon: <TbOlympics size={25} />, label: "Sports", path: RouterUrl.AdminSports },
+  { key: "events", icon: <TbTimelineEventText size={25} />, label: "Events", path: RouterUrl.AdminEvents },
+  { key: "teams", icon: <RiTeamFill size={25} />, label: "Teams", path: RouterUrl.AdminTeams },
+  { key: "schedule", icon: <GrSchedules size={25} />, label: "Game Schedule", path: RouterUrl.AdminGameSched },
+  { key: "scoring", icon: <TbScoreboard size={25} />, label: "Game Scoring", path: RouterUrl.AdminGame },
+  { key: "results", icon: <FaTrophy size={25} />, label: "Results", path: RouterUrl.AdminGameResults },
+  { key: "accounts", icon: <MdManageAccounts size={25} />, label: "Accounts", path: RouterUrl.AdminTeams },
 ];
 
 export default function Private() {

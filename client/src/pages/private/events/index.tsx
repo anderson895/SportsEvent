@@ -31,7 +31,7 @@ export const EventsPage: React.FC = () => {
       </Button>
 
       <Row gutter={[16, 16]}>
-        {Events?.data?.results?.map((event: Events) => (
+        {Events?.map((event: Events) => (
           <Col xs={24} sm={12} md={8} lg={6} key={event.eventId}>
             <Card
               title={event.eventName}

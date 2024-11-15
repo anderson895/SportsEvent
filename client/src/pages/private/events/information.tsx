@@ -1,136 +1,97 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Button,
-  Skeleton,
-  Card,
-  Modal,
-  Select,
-  message,
-  Form,
-  Checkbox,
-} from "antd";
-import EventsServices from "../../../config/service/events";
-import TeamsServices from "../../../config/service/teams"; // Assume you have a Teams service
-import { Events, Sports } from "../../../types";
+import { Button, Skeleton, Card, Modal, Select, Form, Checkbox } from "antd";
 import { dateFormatter } from "../../../utility/utils";
-import SportsServices from "../../../config/service/sports";
+import useInfoHooks from "./useInfoHooks";
+import { useState } from "react";
+import SportEventInformation from "./sportevents";
 
 const { Meta } = Card;
 
 const EventInformation = () => {
-  const { eventId } = useParams();
-  const [form] = Form.useForm();
-  const [info, setInfo] = useState<Events | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [sportsOptions, setSportsOptions] = useState<Sports[]>([]);
-  const [teamsOptions, setTeamsOptions] = useState<
-    { label: string; value: string }[]
-  >([]); // State for teams options
-
-  async function Fetch() {
-    try {
-      const formData = new FormData();
-      formData.append("eventId", eventId || "");
-      const res = await EventsServices.eventInfo(formData);
-      const resSports = await SportsServices.fetchSports();
-      const resTeams = await TeamsServices.fetchTeams(); // Fetch all teams
-
-      setInfo(res.data.results[0]);
-
-      const sportsList = resSports.data.results?.map((v: Sports) => ({
-        label: v.sportsName,
-        value: v.sportsId,
-      }));
-      const teamsList = resTeams.data.results;
-
-      setSportsOptions(sportsList);
-      setTeamsOptions(teamsList);
-    } catch (error) {
-      console.error("Error fetching event information:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const handleAddSports = async (values:any) => {
-    try {
-      const teams = values.teams?.map((v: any) => {
-        const dta: any = teamsOptions?.find((g: any) => g.teamId === v);
-        return {
-          teamName: dta.teamName,
-          teamCoach: dta.teamCoach,
-        };
-      });
-      const formData = new FormData();
-      formData.append("eventId", eventId || "");
-      formData.append("bracket", values.bracketType);
-      formData.append("sports", JSON.stringify(values.selectedSports));
-      formData.append("teams", JSON.stringify(teams));
-      message.success("Sports and teams added successfully!");
-      setIsModalVisible(false);
-      Fetch();
-    } catch (error) {
-      console.error("Error adding sports and teams:", error);
-      message.error("Failed to add sports or teams.");
-    }
-  };
-
-  useEffect(() => {
-    Fetch();
-  }, []);
-
-  const teams = teamsOptions?.map((v: any) => ({
-    label: v.teamName,
-    value: v.teamId,
-  }));
+  const { eventId } = useParams<{ eventId: string }>();
+  const [selectedSport, setSelectedSport] = useState<any | null>(null);
+  const {
+    teams,
+    handleAddSports,
+    form,
+    info,
+    loading,
+    isModalVisible,
+    sportsOptions,
+    setIsModalVisible,
+  } = useInfoHooks({ eventId });
 
   return (
-    <div className="flex flex-col items-center py-8 px-4 md:px-0">
-      {loading ? (
-        <Skeleton active />
-      ) : info ? (
-        <Card
-          className="w-full bg-white rounded-lg"
-          title={<h2 className="text-xl font-bold">{info.eventName}</h2>}
-        >
-          <Meta
-            description={
-              <div className="space-y-4">
-                <p className="text-gray-600">
-                  Date: {dateFormatter(info.eventstartDate)} to{" "}
-                  {dateFormatter(info?.eventendDate)}
-                </p>
-                <div className="mt-4">
-                  <h3 className="text-lg font-semibold">Description</h3>
-                  <div
-                    dangerouslySetInnerHTML={{ __html: info?.description }}
-                  />
-                </div>
-                <div className="mt-4">
-                  <h3 className="text-lg font-semibold">List of Sports</h3>
-                  {/* Display existing sports here */}
-                </div>
-              </div>
+    <>
+      {selectedSport ? (
+          <SportEventInformation sportDetails={selectedSport} />
+        ) : <div className="flex flex-col items-center py-8 px-4 md:px-0">
+        {loading ? (
+          <Skeleton active />
+        ) : info ? (
+          <Card
+            className="w-full bg-white rounded-lg"
+            title={
+              <h2 className="text-xl font-bold">{info.event.eventName}</h2>
             }
-          />
-          <div className="flex justify-center mt-6">
-            <Button
-              type="primary"
-              size="large"
-              onClick={() => setIsModalVisible(true)}
-            >
-              Add Sport
-            </Button>
-          </div>
-        </Card>
-      ) : (
-        <p className="text-gray-600">No event information found.</p>
-      )}
-
+          >
+            <Meta
+              description={
+                <div className="space-y-4">
+                  <p className="text-gray-600">
+                    Date: {dateFormatter(info.event.eventstartDate)} to{" "}
+                    {dateFormatter(info.event?.eventendDate)}
+                  </p>
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold">Description</h3>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: info.event?.description,
+                      }}
+                    />
+                  </div>
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-1">
+                      List of Sports
+                    </h3>
+                    <div className="grid grid-cols-6 gap-2 p-4">
+                      {info?.sportsEvents?.map((v: any) => (
+                        <div
+                          key={v.sportsId}
+                          onClick={() => setSelectedSport(v)}
+                          className="flex rounded-md cursor-pointer flex-col p-4 items-center justify-center shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
+                        >
+                          <img
+                            className="w-16 mb-2"
+                            src={v?.sportInfo?.sportsLogo}
+                            alt={v?.sportInfo?.sportsName}
+                          />
+                          <p className="text-xl font-bold text-black">
+                            {v?.sportInfo?.sportsName}
+                          </p>
+                          <p className="text-md">{v?.bracketType}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              }
+            />
+            <div className="flex justify-center mt-6">
+              <Button
+                type="primary"
+                size="large"
+                onClick={() => setIsModalVisible(true)}
+              >
+                Add Sport
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          <p className="text-gray-600">No event information found.</p>
+        )}
+      </div>}
       <Modal
         title="Select Sports and Teams"
         open={isModalVisible}
@@ -167,13 +128,7 @@ const EventInformation = () => {
 
           <Form.Item label="Teams to Include" name="teams">
             <Checkbox.Group>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                  gap: "8px",
-                }}
-              >
+              <div className="grid grid-cols-2 gap-2">
                 {teams.map((team) => (
                   <Checkbox key={team.value} value={team.value}>
                     {team.label}
@@ -184,7 +139,7 @@ const EventInformation = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </>
   );
 };
 

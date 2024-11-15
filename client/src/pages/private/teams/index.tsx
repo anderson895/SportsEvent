@@ -70,7 +70,7 @@ export const TeamsPage: React.FC = () => {
       >
         Add Team
       </Button>
-      <Table columns={columns} dataSource={teams?.data?.results} rowKey="teamsId" />
+      <Table columns={columns} dataSource={teams} rowKey="teamsId" />
 
       {isModalVisible && <Modal
         title={editingTeam ? "Edit Team" : "Add Team"}

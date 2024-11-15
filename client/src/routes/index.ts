@@ -6,5 +6,9 @@ export const RouterUrl = {
     AdminTeams:'/Teams',
     AdminEvents:'/Events',
     AdminSports:'/Sports',
+    AdminGameSched:'/Game-Schedule',
+    AdminGame:'/Game-Scoring',
+    AdminGameResults:'/Game-Results',
+    MatchScoring:'/Game-Scoring/match/:matchId?',
     EventInfo:'/Events/:eventId?'
 }
