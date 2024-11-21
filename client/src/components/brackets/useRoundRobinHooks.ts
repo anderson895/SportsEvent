@@ -3,9 +3,8 @@ import { useState } from "react";
 import useEventsRequest from "../../config/data/events";
 import { Match, Team, RoundRobinHooksProps } from "../../types";
 
-export default function useRoundRobinHooks({ matches, teams }: RoundRobinHooksProps) {
+export default function useRoundRobinHooks({ teams }: RoundRobinHooksProps) {
   const queryClient = useQueryClient();
-    console.log(matches)
   const [modalState, setModalState] = useState({
     isModalVisible: false,
     isScheduleModalVisible: false,

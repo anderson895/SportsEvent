@@ -13,6 +13,7 @@ const {
   setSchedule,
   doubleSetWinner,
   roundSetWinner,
+  eventsListSports,
 } = require("./events.services");
 
 module.exports = {
@@ -115,6 +116,14 @@ module.exports = {
     try {
       const data = req.body;
       handleResponse(res, setSchedule(data));
+    } catch (error) {
+      errorException(error, res);
+    }
+  },
+
+  SportsEventsListed: (req, res) => {
+    try {
+      handleResponse(res, eventsListSports());
     } catch (error) {
       errorException(error, res);
     }

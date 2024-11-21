@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
-import { Button, Form, FormInstance, Input, Upload, UploadFile } from 'antd';
+import { Button, Form, FormInstance, Input, Select, Upload, UploadFile } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { Team } from '../../../types';
 
@@ -8,6 +9,7 @@ interface TeamsFormProps {
   handleAddOrEditTeam: (values: Team) => void;
   editingTeam?: Team | null;
   loading: boolean;
+  coaches:any;
   setIsImageUpdated:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -16,7 +18,8 @@ const TeamsForm: React.FC<TeamsFormProps> = ({
   handleAddOrEditTeam,
   editingTeam,
   setIsImageUpdated,
-  loading
+  loading,
+  coaches
 }) => {
   const [fileList, setFileList] = useState<UploadFile[]>(
     editingTeam?.teamLogo
@@ -59,7 +62,11 @@ const TeamsForm: React.FC<TeamsFormProps> = ({
         label="Team Coach"
         rules={[{ required: true, message: 'Please input the coach name!' }]}
       >
-        <Input />
+             <Select>
+              {coaches?.map((coach: any) => (
+                <Select.Option key={coach.id} value={coach.id}>Coach  {coach.username}</Select.Option>
+              ))}
+            </Select>
       </Form.Item>
       <Form.Item
         name="teamLogo"

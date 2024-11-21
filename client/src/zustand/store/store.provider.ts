@@ -7,7 +7,8 @@ const storeProvider = useStore.getState();
 
 export const {
   saveAdminInfo,
-  setShowLoading
+  setShowLoading,
+  logoutAdmin
 } = storeProvider;
 
 export { selector, storeProvider };

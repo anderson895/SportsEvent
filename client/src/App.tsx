@@ -1,9 +1,12 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
 import { RouterUrl } from "./routes";
-import { Private, Public } from "./layout";
+import { CoachSide, Private, Public } from "./layout";
 import {
   AdminDashboard,
+  CoachDashboard,
+  CoachTeamPage,
+  CoachTeamStanding,
   EventsPage,
   GameResults,
   GameSchedule,
@@ -11,9 +14,12 @@ import {
   LandingPage,
   LoginPage,
   MatchScoring,
+  MediaPage,
   RegistrationPage,
   SportsPage,
+  TeamInfo,
   TeamsPage,
+  UserAccounts,
 } from "./pages";
 import EventInformation from "./pages/private/events/information";
 
@@ -30,10 +36,20 @@ function App() {
     },
     {
       path: RouterUrl.LandingPage,
+      element: <CoachSide />,
+      children: [
+        { path: RouterUrl.Coach, element: <CoachDashboard /> },
+        { path: RouterUrl.CoachStanding, element: <CoachTeamStanding /> },
+        { path: RouterUrl.CoachTeam, element: <CoachTeamPage /> },
+      ],
+    },
+    {
+      path: RouterUrl.LandingPage,
       element: <Private />,
       children: [
         { path: RouterUrl.AdminDashboard, element: <AdminDashboard /> },
         { path: RouterUrl.AdminTeams, element: <TeamsPage /> },
+        { path: RouterUrl.AdminTeamsInfo, element: <TeamInfo /> },
         { path: RouterUrl.AdminGame, element: <GameScoring /> },
         { path: RouterUrl.AdminGameResults, element: <GameResults /> },
         { path: RouterUrl.AdminGameSched, element: <GameSchedule /> },
@@ -41,6 +57,8 @@ function App() {
         { path: RouterUrl.AdminSports, element: <SportsPage /> },
         { path: RouterUrl.EventInfo, element: <EventInformation /> },
         { path: RouterUrl.MatchScoring, element: <MatchScoring /> },
+        { path: RouterUrl.Accounts, element: <UserAccounts /> },
+        { path: RouterUrl.AdminMedia, element: <MediaPage /> },
       ],
     },
   ]);

@@ -1,6 +1,6 @@
 const { errorException } = require("../../helpers/errorException");
 const { handleResponse } = require("../../helpers/handleResponse");
-const { createSports, fetchSports, editSports, deleteSports } = require("./sports.services");
+const { createSports, fetchSports, editSports, deleteSports, fetchAllData } = require("./sports.services");
 
 module.exports = {
     AddSports:(req,res) =>{
@@ -10,13 +10,19 @@ module.exports = {
             data.sportsLogo = file;
             handleResponse(res, createSports(data))
         } catch (error) {
-            console.log(error)
             errorException(error,res)
         }
     },
     SportsList:(req,res) =>{
         try {
             handleResponse(res,fetchSports())
+        } catch (error) {
+            errorException(error,res)
+        }
+    },
+    EventSummary:(req,res) =>{
+        try {
+            handleResponse(res,fetchAllData())
         } catch (error) {
             errorException(error,res)
         }

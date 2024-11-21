@@ -46,7 +46,7 @@ export default function useInfoHooks({ eventId }: UseInfoHooksParams) {
       const formattedTeams = teams?.map((team: any) => ({
         label: team.teamName,
         value: team.teamId,
-        teamCoach:team.teamCoach,
+        teamCoach:team.coachId,
         teamId: team.teamId
       }));
       setTeamsOptions(formattedTeams);
@@ -72,6 +72,7 @@ export default function useInfoHooks({ eventId }: UseInfoHooksParams) {
       const formData = new FormData();
       formData.append("eventsId", eventId || "");
       formData.append("bracketType", values.bracketType);
+      formData.append("maxPlayers", values.maxPlayers);
       formData.append("sportsId", JSON.stringify(values.selectedSports));
       formData.append("teams", JSON.stringify(selectedTeams));
       addSportEventsMutation(formData, {

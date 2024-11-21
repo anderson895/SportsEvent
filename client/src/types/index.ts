@@ -4,6 +4,7 @@ export interface Team {
   teamName: string;
   teamCoach: string;
   teamLogo: any;
+  players:any[];
 }
 export interface Events {
   eventId: number;
@@ -69,3 +70,58 @@ export interface RoundRobinHooksProps {
   teams: Team[];
 }
 
+export interface User {
+  id: number;
+  username: string;
+  password: string;
+  collegeName: string;
+  type: string;
+  teamId: number | null;
+  status: string;
+}
+
+export interface Player {
+  playerId: number;
+  playerName: string;
+  position: string;
+}
+
+export interface SportDetails {
+  sportsId: number;
+  sportsName: string;
+  sportsLogo: string;
+  description: string;
+}
+
+export interface EventDetails {
+  eventId: number;
+  eventName: string;
+  eventYear: number;
+  eventStartDate: string;
+  eventEndDate: string;
+  description: string;
+}
+
+
+export interface HandledEvent {
+  sportEventsId: number;
+  sportsId: number;
+  eventsId: number;
+  bracketType: string;
+  coachId: number | null;
+  eventDetails: EventDetails | null;
+  sportDetails: SportDetails | null;
+  team: Team | null;
+  players: Player[];
+}
+
+export interface CoachInfo {
+  coach: {
+    id: number;
+    username: string;
+    type: string;
+    teamId: number;
+    status: string;
+  };
+  handledEvents: HandledEvent[];
+}

@@ -58,13 +58,13 @@ const uploadImage = async (fileBuffer, fileName, existingFileUrl = null) => {
     if (existingFileUrl) {
       await deleteImageByURL(existingFileUrl);
     }
-
+    const uniqueFilename = generateUniqueFilename(fileName);
     return new Promise((resolve, reject) => {
       const file = ImageuploadBuffer(fileBuffer); 
       imagekit.upload(
         {
           file: file,
-          fileName: fileName,
+          fileName: uniqueFilename,
         },
         (error, result) => {
           if (error) {
@@ -80,6 +80,17 @@ const uploadImage = async (fileBuffer, fileName, existingFileUrl = null) => {
   }
 };
 
+/**
+ * Generate a unique filename by appending a timestamp to the original filename.
+ * @param {string} originalName - The original file name.
+ * @returns {string} - The unique filename.
+ */
+const generateUniqueFilename = (originalName) => {
+  const timestamp = Date.now(); // Get the current timestamp
+  return `${timestamp}_${originalName}`;
+};
 
 
-module.exports = {ImageuploadBuffer,uploadImage,deleteImageByURL};
+
+
+module.exports = {ImageuploadBuffer,uploadImage,deleteImageByURL,generateUniqueFilename};

@@ -5,7 +5,6 @@ const queryAsync = util.promisify(pool.query).bind(pool);
 const getSportsEventsWithDetails = async (sportsEvents) => {
     return Promise.all(
         sportsEvents.map(async (sportsEvent) => {
-            console.log('id',sportsEvents)
             const sportInfo = await fetchSportInfo(sportsEvent.sportsId);
             const teams = await fetchTeamsForSportEvent(sportsEvent.sportEventsId);
             const matches = await fetchMatchesList(sportsEvent.sportEventsId)

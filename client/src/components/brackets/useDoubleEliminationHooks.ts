@@ -18,8 +18,6 @@ export default function useDoubleEliminationHooks({ matches, teams }: DoubleElim
     setIsModalVisible: (visible) => setModalState((prev) => ({ ...prev, isModalVisible: visible })),
   });
 
-  console.log(matches)
-
   const winnersRounds = (matches ?? []).filter((match) => match.bracketType === "winners").reduce((acc, match) => {
     acc[match.round] = acc[match.round] ? [...acc[match.round], match] : [match];
     return acc;

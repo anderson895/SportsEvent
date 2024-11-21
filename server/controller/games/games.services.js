@@ -95,8 +95,7 @@ module.exports = {
 
   gameStatus:async(data) =>{
     const { matchId, status } = data;
-    console.log(matchId)
-    console.log(status)
+ 
     if (!matchId || !status) {
         return { success: 0, message: "matchId and status are required" }
     }

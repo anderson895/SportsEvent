@@ -427,7 +427,6 @@ const generateRoundRobinMatches = async (sportEventsId, teams) => {
         ]);
     }
   }
-  console.log(schedule)
 };
 
 const advanceWinnerToNextMatch = async (winnerId, nextMatchId) => {
@@ -463,7 +462,6 @@ async function setTeamInNextMatch(matchId, teamId) {
     .query("SELECT * FROM matches WHERE matchId = ?", [matchId]);
   if (match.length === 0) return;
 
-  // Check if team1Id is empty, if so, update it with teamId, otherwise update team2Id
   const updateField = match[0].team1Id === null ? "team1Id" : "team2Id";
 
   await db
@@ -474,7 +472,6 @@ async function setTeamInNextMatch(matchId, teamId) {
     ]);
 }
 
-// Helper function to check if a champion has been determined or if a rematch is needed
 async function checkForChampion(winnerTeamId, loserTeamId, match) {
   if (match.isFinal && match.bracketType === "winners") {
     const losersFinalMatch = await db
@@ -483,7 +480,6 @@ async function checkForChampion(winnerTeamId, loserTeamId, match) {
         "SELECT * FROM matches WHERE bracketType = 'losers' AND isFinal = 1"
       );
 
-    // Check if the losers bracket champion has won the final
     if (
       losersFinalMatch.length === 1 &&
       losersFinalMatch[0].winner_team_id === loserTeamId
@@ -495,7 +491,6 @@ async function checkForChampion(winnerTeamId, loserTeamId, match) {
         );
 
       if (existingResetMatch.length === 0) {
-        // Create a reset match if it doesn't already exist
         await db
           .promise()
           .query(
@@ -511,20 +506,37 @@ async function checkForChampion(winnerTeamId, loserTeamId, match) {
               "reset",
             ]
           );
-        return null; // No champion yet, rematch created
+        return null; 
       } else {
-        return null; // No champion yet, waiting for reset match
+        return null; 
       }
     }
   }
 
-  // If it's a reset final and completed, determine the champion
   if (match.bracketType === "reset" && match.isFinal) {
-    return winnerTeamId; // Winner of the reset match is the champion
+    return winnerTeamId; 
   }
 
   return null;
 }
+
+const updateTeamStanding = async (winnerTeamId, loserTeamId) => {
+  try {
+    await queryAsync(
+      "UPDATE teams_events SET teamWin = teamWin + 1 WHERE teamId = ?",
+      [winnerTeamId]
+    );
+
+    await queryAsync(
+      "UPDATE teams_events SET teamLose = teamLose + 1 WHERE teamId = ?",
+      [loserTeamId]
+    );
+  } catch (error) {
+    console.error("Error updating team standings:", error);
+    throw new Error("Failed to update team standings");
+  }
+};
+
 
 module.exports = {
   generateDoubleEliminationMatches,
@@ -532,4 +544,5 @@ module.exports = {
   generateRoundRobinMatches,
   setTeamInNextMatch,
   checkForChampion,
+  updateTeamStanding
 };

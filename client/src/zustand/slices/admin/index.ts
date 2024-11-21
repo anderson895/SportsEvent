@@ -12,6 +12,7 @@ export interface AdminSlice {
     admin: AdminState;
     saveAdminInfo: (payload:any) => void;
     setShowLoading: (payload: boolean) => void;
+    logoutAdmin:() => void;
 }
 
 const initialState: AdminState = {  
@@ -41,6 +42,12 @@ const createAdminSlice: StateCreator<AdminSlice> = (set) =>({
             }
         }))
     },
+    logoutAdmin: () => {
+        set((state) => ({
+          ...state,
+          admin: initialState,
+        }));
+      },
 })
 
 export default createAdminSlice

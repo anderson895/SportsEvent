@@ -27,7 +27,6 @@ const EnterScoresModal: React.FC<EnterScoresModalProps> = ({
   handleScoreSubmit,
   onCancel,
 }) => {
-  console.log(selectedMatch)
   return (
   <Modal
     title="Enter Match Scores"

@@ -8,7 +8,7 @@ import useTeamsRequest from "../../../config/data/teams";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function useTeamsHooks() {
-  const queryClient = useQueryClient(); // Initialize the QueryClient for refetching
+  const queryClient = useQueryClient();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isImageUpdated, setIsImageUpdated] = useState(false);
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
@@ -18,9 +18,11 @@ export default function useTeamsHooks() {
       setIsModalVisible,
     });
 
-  const { data: teams, isPending: isFetchingTeams } = useFetchData(
+  const { data: [teams,coaches] =[], isPending: isFetchingTeams } = useFetchData(
     ["teams"],
-    [() => TeamsServices.fetchTeams()]
+    [() => TeamsServices.fetchTeams(),
+      () => TeamsServices.fetchCoaches()
+    ]
   );
 
   const handleAddOrEditTeam = (values: Team) => {
@@ -71,14 +73,16 @@ export default function useTeamsHooks() {
     }
     setIsModalVisible(true);
   };
-
+  console.log(coaches)
   const loading = isLoading || isFetchingTeams;
   return {
-    teams,
+    teams:teams || [],
     isModalVisible,
     editingTeam,
+    isFetchingTeams,
     form,
     loading,
+    coaches,
     setIsImageUpdated,
     handleAddOrEditTeam,
     setIsModalVisible,

@@ -1,8 +1,9 @@
 const multer = require('multer');
-const { EventLists, AddEvents, EditEvents, DeleteEvent, EventInfo, SportsEvents, CreateMatch, BracketMatches, SingleSetScore, SetMatchSchedule, DoubleSetScore, RoundRobinSetScore } = require('../controller/events/events.controller');
+const { EventLists, AddEvents, EditEvents, DeleteEvent, EventInfo, SportsEvents, CreateMatch, BracketMatches, SingleSetScore, SetMatchSchedule, DoubleSetScore, RoundRobinSetScore, SportsEventsListed } = require('../controller/events/events.controller');
 const router = require('express').Router();
 
 router.get('/list', multer().none(), EventLists)
+router.get('/sports-events', multer().none(), SportsEventsListed)
 router.post('/add',multer().none(), AddEvents)
 router.post('/single/set-winner',multer().none(), SingleSetScore)
 router.post('/double/set-winner',multer().none(), DoubleSetScore)

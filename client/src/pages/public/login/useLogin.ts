@@ -4,7 +4,6 @@ import UserServices from "../../../config/service/users";
 import { saveAdminInfo } from "../../../zustand/store/store.provider";
 import { useRequestData } from "../../../config/axios/requestData";
 import { useNavigate } from "react-router-dom";
-import { RouterUrl } from "../../../routes";
 
 export default function useLogin() {
   const [form] = Form.useForm();
@@ -14,8 +13,16 @@ export default function useLogin() {
     (formData: FormData) => UserServices.login(formData),
     {
       onSuccess: (data) => {
-        saveAdminInfo(data); 
-        navigate(RouterUrl.AdminDashboard); 
+        if(data.data.success === 0){
+          notification.error({
+            message: "Login failed",
+            description: data.data.message || "Please check your credentials and try again.",
+          });
+          return
+        }
+        const info = data.data.results
+        saveAdminInfo(info); 
+        navigate(data.data.navigate); 
       },
       onError: (error) => {
         notification.error({

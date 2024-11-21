@@ -11,6 +11,7 @@ const checkUniqueField = async (tableName, fieldName, value, currentValue = null
 
     const query = `SELECT COUNT(*) AS count FROM ?? WHERE ?? = ?`;
     const result = await queryAsync(query, [tableName, fieldName, value]);
+  
     const isUnique = result[0].count === 0;
 
     if (!isUnique) {
