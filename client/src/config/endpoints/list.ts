@@ -45,6 +45,11 @@ const Api = {
     ID: ApiEndpoint(base + '/match'),
     INCREMENT: ApiEndpoint(base + '/increment-score'),
     STATUS: ApiEndpoint(base + '/status'),
+  }),
+  MEDIA:(base = '/media') =>({
+    LIST: ApiEndpoint(base + '/list'),
+    ADD: ApiEndpoint(base + '/add'),
+    DELETE: ApiEndpoint(base + '/delete-media'),
   })
 };
 

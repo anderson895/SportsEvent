@@ -1,155 +1,212 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { Upload, Modal, Button, Image, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { RcFile } from "antd/es/upload";
+import { Button, Modal, Upload, Select, Form, Typography, message } from "antd";
+import { UploadOutlined, InboxOutlined } from "@ant-design/icons";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import useMediaHooks from "./useMedia";
+import SwiperCarousel from "../../../components/swiper";
+
+const { Option } = Select;
+const { Dragger } = Upload;
+const { Title, Text } = Typography;
 
 export const MediaPage: React.FC = () => {
-  const [images, setImages] = useState<string[]>([]);
-  const [videos, setVideos] = useState<string[]>([]);
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [imageFileList, setImageFileList] = useState<RcFile[]>([]);
-  const [videoFileList, setVideoFileList] = useState<RcFile[]>([]);
+  const {
+    Medias,
+    isModalVisible,
+    form,
+    loading,
+    isFetchingMedia,
+    handleUploadMedia,
+    setIsModalVisible,
+    handleDeleteMedia,
+  } = useMediaHooks();
 
-  const handlePreview = (url: string) => {
-    setPreviewImage(url);
-    setPreviewVisible(true);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewType, setPreviewType] = useState<"image" | "video">("image");
+
+  const handleFormSubmit = (values: any) => {
+    handleUploadMedia(values);
+    setPreviewUrl(""); 
   };
 
-  const handleCancelPreview = () => setPreviewVisible(false);
-
-  const handleImageUpload = async () => {
-    try {
-      const newImages = imageFileList.map((file) => URL.createObjectURL(file));
-      setImages([...images, ...newImages]);
-      setImageFileList([]);
-      message.success("Images uploaded successfully!");
-    } catch (err) {
-      message.error("Failed to upload images.");
+  const handlePreview = (file: any) => {
+    const isImage = file.type.startsWith("image/");
+    const isVideo = file.type.startsWith("video/");
+    if (isImage || isVideo) {
+      setPreviewType(isImage ? "image" : "video");
+      setPreviewUrl(URL.createObjectURL(file.originFileObj || file));
     }
   };
 
-  const handleVideoUpload = async () => {
-    try {
-      const newVideos = videoFileList.map((file) => URL.createObjectURL(file));
-      setVideos([...videos, ...newVideos]);
-      setVideoFileList([]);
-      message.success("Videos uploaded successfully!");
-    } catch (err) {
-      message.error("Failed to upload videos.");
-    }
+  const confirmDelete = (mediaId: number) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this media?",
+      content: "This action cannot be undone.",
+      okText: "Yes, Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: () => handleDeleteMedia(mediaId),
+      onCancel: () => message.info("Delete action cancelled."),
+    });
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Text>Loading media...</Text>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Event Gallery</h1>
+    <div className="p-6  min-h-screen">
+      <Title level={2} className="text-gray-800 mb-8 text-center">
+        Media Gallery
+      </Title>
 
-      {/* Images Section */}
-      <div className="mb-10">
-        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Upload Photos
-          </h2>
-          <Upload
-            multiple
-            fileList={imageFileList}
-            beforeUpload={(file) => {
-              setImageFileList((prev) => [...prev, file]);
-              return false;
-            }}
-            onRemove={(file) =>
-              setImageFileList((prev) =>
-                prev.filter((item) => item.uid !== file.uid)
-              )
-            }
-            accept="image/*"
-          >
-            <Button icon={<UploadOutlined />}>Select Images</Button>
-          </Upload>
-          <Button
-            type="primary"
-            onClick={handleImageUpload}
-            disabled={!imageFileList.length}
-            className="mt-4"
-          >
-            Upload
-          </Button>
-        </div>
-
-        {/* Display Images */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {images.map((url, index) => (
-            <div
-              key={index}
-              className="bg-white shadow-md rounded-lg overflow-hidden"
-            >
-              <Image
-                src={url}
-                className="object-cover w-full h-48"
-                preview={false}
-                onClick={() => handlePreview(url)}
-              />
-            </div>
-          ))}
-        </div>
+      <div className="flex justify-center my-8">
+        <Button
+          type="primary"
+          icon={<UploadOutlined />}
+          size="large"
+          onClick={() => setIsModalVisible(true)}
+        >
+          Upload Media
+        </Button>
       </div>
 
-      {/* Videos Section */}
+      <div className="mb-12">
+        <Title level={3} className="text-gray-800 mb-4">
+          Images
+        </Title>
+        {Medias && Medias.length > 0 ? (
+          <SwiperCarousel
+            items={Medias.filter(
+              (media: { type: string }) => media.type === "image"
+            ).map((media: { type: string; url: string; id: number }) => ({
+              media: media.url,
+              buttonText: "DELETE", 
+              type: media.type,
+              mediaId: media.id, 
+            }))}
+            onButtonClick={confirmDelete} 
+          />
+        ) : (
+          <Text>No images uploaded yet.</Text>
+        )}
+      </div>
+
       <div>
-        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Upload Videos
-          </h2>
-          <Upload
-            multiple
-            fileList={videoFileList}
-            beforeUpload={(file) => {
-              setVideoFileList((prev) => [...prev, file]);
-              return false;
-            }}
-            onRemove={(file) =>
-              setVideoFileList((prev) =>
-                prev.filter((item) => item.uid !== file.uid)
-              )
-            }
-            accept="video/*"
-          >
-            <Button icon={<UploadOutlined />}>Select Videos</Button>
-          </Upload>
-          <Button
-            type="primary"
-            onClick={handleVideoUpload}
-            disabled={!videoFileList.length}
-            className="mt-4"
-          >
-            Upload
-          </Button>
-        </div>
-
-        {/* Display Videos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {videos.map((url, index) => (
-            <div
-              key={index}
-              className="bg-white shadow-md rounded-lg overflow-hidden"
-            >
-              <video
-                src={url}
-                controls
-                className="w-full h-48 object-cover"
-              ></video>
-            </div>
-          ))}
-        </div>
+        <Title level={3} className="text-gray-800 mb-4">
+          Videos
+        </Title>
+        {Medias && Medias.length > 0 ? (
+          <SwiperCarousel
+            items={Medias.filter(
+              (media: { type: string }) => media.type === "video"
+            ).map((media: { type: string; url: string; id: number }) => ({
+              media: media.url,
+              buttonText: "DELETE", 
+              type: media.type,
+              mediaId: media.id, 
+            }))}
+            onButtonClick={confirmDelete} 
+          />
+        ) : (
+          <Text>No videos uploaded yet.</Text>
+        )}
       </div>
 
-      {/* Preview Modal */}
       <Modal
-        open={previewVisible}
+        title="Upload Media"
+        open={isModalVisible}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setPreviewUrl(""); 
+        }}
         footer={null}
-        onCancel={handleCancelPreview}
+        width={600}
       >
-        <img alt="Preview" style={{ width: "100%" }} src={previewImage} />
+        <Form layout="vertical" form={form} onFinish={handleFormSubmit}>
+          <Form.Item
+            label="Select Media Type"
+            name="type"
+            rules={[{ required: true, message: "Please select a media type." }]}
+          >
+            <Select placeholder="Select Media Type">
+              <Option value="image">Image</Option>
+              <Option value="video">Video</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Upload Media"
+            name="media"
+            valuePropName="fileList"
+            getValueFromEvent={(e: any) => (Array.isArray(e) ? e : e?.fileList)}
+            rules={[{ required: true, message: "Please upload a file." }]}
+          >
+            <Dragger
+              beforeUpload={(file) => {
+                handlePreview(file);
+                return false; 
+              }}
+              multiple={false}
+              maxCount={1}
+            >
+              {previewUrl ? (
+                <div className="p-4 bg-gray-100 rounded-lg">
+                  {previewType === "image" ? (
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "200px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  ) : (
+                    <video
+                      src={previewUrl}
+                      controls
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "200px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      }}
+                    ></video>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <p className="ant-upload-drag-icon">
+                    <InboxOutlined />
+                  </p>
+                  <p className="ant-upload-text">
+                    Drag & drop your file here, or click to browse.
+                  </p>
+                </>
+              )}
+            </Dragger>
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              loading={isFetchingMedia}
+            >
+              Upload
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );

@@ -1,0 +1,102 @@
+/* Swiper Container */
+.swiper-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    background-color: #eef2f5;
+    border-radius: 20px;
+    padding: 30px 20px;
+  }
+  
+  /* Swiper Slide */
+  .swiper-slide-custom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 16px;
+  }
+  
+  /* Slide Content */
+  .slide-content {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    border-radius: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .slide-content:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Overlay */
+  .slide-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-align: center;
+    padding: 20px 10px;
+    padding-bottom: 30px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .slide-content:hover .slide-overlay {
+    opacity: 1;
+  }
+  
+  /* Title */
+  .slide-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  /* Subtitle */
+  .slide-subtitle {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  /* Button */
+  .slide-button {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .slide-button:hover {
+    background: #ff3d3d;
+  }
+  
+  /* Custom Navigation Arrows */
+  .swiper-button-next,
+  .swiper-button-prev {
+    background: rgba(255, 255, 255, 0.8);
+    color: #007bff;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .swiper-button-next:hover,
+  .swiper-button-prev:hover {
+    background: #ffffff;
+    color: #0056b3;
+  }
+  

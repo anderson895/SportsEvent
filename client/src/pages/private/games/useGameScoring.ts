@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import GamesServices from "../../../config/service/games";
 import { useQueryClient } from "@tanstack/react-query";
 import useEventsRequest from "../../../config/data/events";
+import { notification } from "antd";
 
 export default function useGameScorig({ matchId }: { matchId?: any }) {
   const queryClient = useQueryClient();
@@ -17,7 +18,7 @@ export default function useGameScorig({ matchId }: { matchId?: any }) {
 
   const { data: Match } = useFetchData(["Game"], [GamesServices.gameSchedule]);
   const { data: [MatchInfo] = [] } = useFetchData(["game-id"], [() => GamesServices.gameMatchId(matchId)]);
-  const { setScore } = useEventsRequest({
+  const { setScore, setScore1,setScore2 } = useEventsRequest({
     setIsModalVisible: () => setIsModalVisible(false),
   });
   const { incrementScoring, changingStatus } = useGameRequest({ setIsModalVisible: () => {} });
@@ -62,15 +63,22 @@ export default function useGameScorig({ matchId }: { matchId?: any }) {
         formData.append("team1Score", team1Score.toString());
         formData.append("team2Score", team2Score.toString());
         formData.append("matchId",matchId.toString());
-  
-        setScore(formData, {
+        if(!MatchInfo?.sportEvent?.bracketType){
+          notification.error({
+            message:'No bracketType detected'
+          })
+          return
+        }
+        const api = MatchInfo?.sportEvent?.bracketType === 'Single Elimination' ? setScore : MatchInfo?.sportEvent?.bracketType === 'Double Elimination' ? setScore1 : setScore2
+        api(formData, {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["game-id"] });
           },
         });
       }
   }
-
+  console.log('match',MatchInfo)
+  console.log('match1',MatchInfo?.sportEvent?.bracketType)
   return {
     Match,
     isFetchingMatch: !Match,

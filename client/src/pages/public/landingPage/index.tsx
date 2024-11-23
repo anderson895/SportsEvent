@@ -14,6 +14,9 @@ import {
   Thumbs,
 } from "swiper/modules";
 import Marquee from "react-fast-marquee";
+import FirstSection from "./firstSection";
+import SecondSection from "./secondSection";
+import { AnimatedComponent, createSlideInVariant } from "../animation";
 
 export const LandingPage = () => {
   const thumbsSwiperRef = useRef(null); // useRef to hold the Swiper instance for thumbnails
@@ -108,66 +111,67 @@ export const LandingPage = () => {
     "Upcoming Events: Basketball Championship - March 12, Soccer League Finals - April 18, Annual Marathon - June 6";
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      {/* Marquee Section */}
-      <div className="bg-[#064518] text-white text-center">
-        <Marquee gradient={false} speed={50}>
-          {scheduleText}
-        </Marquee>
-      </div>
-
-      {/* Header Navigation */}
-      <header className="bg-white shadow-md fixed top-6 left-0 right-0 z-10">
-        <div className="container mx-auto flex justify-between items-center py-4 px-6">
-          <div className="text-2xl font-bold text-[#064518] flex items-center gap-4">
-            <img src="/ncfi-logo.png" className="w-12" alt="" />
-            <p>Naga College Foundation, Inc.</p>
+    <div className="bg-gray-100 min-h-screen relative overflow-hidden">
+      <header className="bg-[#f8ba00] h-20 shadow-md">
+        <div className="flex justify-end relative items-center">
+          <div className="absolute top-0 -left-12 flex items-center z-50 pl-24 gap-4 bg-[#064518] text-white pr-12 py-2 h-28 w-[40%] -skew-x-12">
+            <img src="/ncfi-logo.png" className="w-24" alt="NCFI Logo" />
+            <p className="text-3xl font-bold">Naga College Foundation, Inc.</p>
           </div>
-          <nav>
-            <ul className="flex space-x-8">
-              <li className="relative group">
-                <a
-                  href="#home"
-                  className="text-gray-700 font-medium transition duration-300"
-                >
-                  Home
-                </a>
-                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#064518] transition-all duration-300 group-hover:w-full"></span>
-              </li>
-              <li className="relative group">
-                <a
-                  href="#news"
-                  className="text-gray-700 font-medium transition duration-300"
-                >
-                  News
-                </a>
-                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#064518] transition-all duration-300 group-hover:w-full"></span>
-              </li>
-              <li className="relative group">
-                <a
-                  href="#videos"
-                  className="text-gray-700 font-medium transition duration-300"
-                >
-                  Videos
-                </a>
-                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#064518] transition-all duration-300 group-hover:w-full"></span>
-              </li>
-              <li className="relative group">
-                <a
-                  href="#photos"
-                  className="text-gray-700 font-medium transition duration-300"
-                >
-                  Photos
-                </a>
-                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#064518] transition-all duration-300 group-hover:w-full"></span>
-              </li>
-            </ul>
-          </nav>
+
+          <div className="flex flex-col items-end relative">
+            <div className="bg-[#064518] absolute w-screen h-8 flex justify-center items-center text-white text-center">
+              <Marquee gradient={false} speed={50}>
+                {scheduleText}
+              </Marquee>
+            </div>
+
+            <AnimatedComponent variants={createSlideInVariant("down")}>
+              <nav className="z-20 h-ful mt-10 mr-10">
+                <ul className="flex gap-16 text-white">
+                  <li className="relative group">
+                    <a
+                      href="#home"
+                      className="font-medium transition duration-300 hover:text-gray-800"
+                    >
+                      Home
+                    </a>
+                  </li>
+                  <li className="relative group">
+                    <a
+                      href="#news"
+                      className="font-medium transition duration-300 hover:text-gray-800"
+                    >
+                      News
+                    </a>
+                  </li>
+                  <li className="relative group">
+                    <a
+                      href="#videos"
+                      className="font-medium transition duration-300 hover:text-gray-800"
+                    >
+                      Videos
+                    </a>
+                  </li>
+                  <li className="relative group">
+                    <a
+                      href="#photos"
+                      className="font-medium transition duration-300 hover:text-gray-800"
+                    >
+                      Photos
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </AnimatedComponent>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="pt-20">
+      <main>
+        <FirstSection />
+        <SecondSection />
         {/* Hero Carousel Section */}
         <section className="relative" id="home">
           <Swiper

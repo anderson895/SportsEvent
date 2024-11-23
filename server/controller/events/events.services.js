@@ -153,17 +153,17 @@ module.exports = {
 
   generateMatch: async (data) => {
     try {
-      let { sportEventsId, teams, bracketType } = data;
+      let { sportEventsId,sportsId, teams, bracketType } = data;
 
       switch (bracketType) {
         case "Single Elimination":
-          await generateSingleEliminationMatches(sportEventsId, teams);
+          await generateSingleEliminationMatches(sportEventsId, teams,sportsId);
           break;
         case "Double Elimination":
-          await generateDoubleEliminationMatches(sportEventsId, teams);
+          await generateDoubleEliminationMatches(sportEventsId, teams,sportsId);
           break;
         case "Round Robin":
-          await generateRoundRobinMatches(sportEventsId, teams);
+          await generateRoundRobinMatches(sportEventsId, teams,sportsId);
           break;
         default:
           return { success: 0, message: "Invalid bracket type" };
@@ -180,6 +180,7 @@ module.exports = {
 
   bracketMatch: async (data) => {
     try {
+      console.log(data)
       const sportsId = data.sportEventsId;
       const res = await queryAsync(
         "SELECT * FROM brackets where sportsId = ?",
@@ -224,10 +225,13 @@ module.exports = {
       }
 
       let winnerId;
+      let loserId;
       if (team1Score > team2Score) {
         winnerId = team1Id;
+        loserId = team2Id
       } else if (team2Score > team1Score) {
         winnerId = team2Id;
+        loserId = team1Id
       } else {
         return {
           success: 0,
@@ -272,7 +276,7 @@ module.exports = {
 
   doubleSetWinner: async (data) => {
     const { team1Score, team2Score, matchId } = data;
-
+    
     try {
       const matchResult = await queryAsync(
         "SELECT * FROM matches WHERE matchId = ?",
@@ -312,20 +316,16 @@ module.exports = {
 
       await updateTeamStanding(winnerTeamId, loserTeamId);
 
-      if (bracketType === "winners") {
-        if (next_match_id) {
-          await setTeamInNextMatch(next_match_id, winnerTeamId);
-        }
-        if (loser_next_match_id) {
-          await setTeamInNextMatch(loser_next_match_id, loserTeamId);
-        }
-      } else if (bracketType === "losers") {
-        if (next_match_id) {
-          await setTeamInNextMatch(next_match_id, winnerTeamId);
-        } else if (loser_next_match_id) {
-          await setTeamInNextMatch(loser_next_match_id, winnerTeamId);
-        }
+      if (next_match_id) {
+        console.log(`Updating winner to next match: ${next_match_id}`);
+        await setTeamInNextMatch(next_match_id, winnerTeamId);
       }
+  
+      if (loser_next_match_id) {
+        console.log(`Updating loser to next match: ${loser_next_match_id}`);
+        await setTeamInNextMatch(loser_next_match_id, loserTeamId);
+      }
+      
 
       const champion = await checkForChampion(winnerTeamId, loserTeamId, match);
       if (champion) {
@@ -366,10 +366,13 @@ module.exports = {
       }
 
       let winnerId;
+      let loserId;
       if (team1Score > team2Score) {
         winnerId = team1Id;
+        loserId = team2Id
       } else if (team2Score > team1Score) {
         winnerId = team2Id;
+        loserId = team1Id
       } else {
         return {
           success: 0,

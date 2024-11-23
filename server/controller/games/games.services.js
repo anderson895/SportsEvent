@@ -12,11 +12,16 @@ module.exports = {
         matches.map(async (match) => {
           const team1 = await queryAsync("SELECT * FROM teams WHERE teamId = ?", [match.team1Id]);
           const team2 = await queryAsync("SELECT * FROM teams WHERE teamId = ?", [match.team2Id]);
-
+          const sportEvent = await queryAsync("SELECT * FROM sports_events where sportEventsId =?",[match.sportEventsId])
+          const event = await queryAsync("SELECT * FROM events where eventId = ?",[sportEvent[0].eventsId])
+          const sport = await queryAsync("SELECT * from sports where sportsId = ?",[sportEvent[0].sportsId])
           return {
             ...match,
             team1: team1[0] || null,
             team2: team2[0] || null,
+            sportEvent:sportEvent[0] || null,
+            event:event[0] || null,
+            sport:sport[0] || null,
           };
         })
       );
@@ -38,11 +43,17 @@ module.exports = {
 
       const team1 = await queryAsync("SELECT * FROM teams WHERE teamId = ?", [match[0].team1Id]);
       const team2 = await queryAsync("SELECT * FROM teams WHERE teamId = ?", [match[0].team2Id]);
-
+      const sportEvent = await queryAsync("SELECT * FROM sports_events where sportEventsId =?",[match[0].sportEventsId])
+      const event = await queryAsync("SELECT * FROM events where eventId = ?",[sportEvent[0].eventsId])
+      const sport = await queryAsync("SELECT * from sports where sportsId = ?",[sportEvent[0].sportsId])
+   
       const matchWithTeams = {
         ...match[0],
         team1: team1[0] || null,
         team2: team2[0] || null,
+        sportEvent:sportEvent[0] || null,
+        event:event[0] || null,
+        sport:sport[0] || null,
       };
 
       return { success: 1, results: matchWithTeams };

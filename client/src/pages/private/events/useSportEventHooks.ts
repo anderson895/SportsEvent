@@ -13,13 +13,14 @@ export interface SportEventInformationProps {
         sportsLogo: string;
         description: string;
       };
+      sportEventsId:any;
       teams: Team[];
       bracketType: 'Single Elimination' | 'Double Elimination' | 'Round Robin';
     };
   }
 export default function useSportEventHooks({sportDetails}:SportEventInformationProps) {
     const queryClient = useQueryClient();
-    const sportEventsId = sportDetails.sportsId
+    const sportEventsId = sportDetails.sportEventsId
     const { data: [matches] = [] } = useFetchData(
         ["matches"],
         [
@@ -28,7 +29,7 @@ export default function useSportEventHooks({sportDetails}:SportEventInformationP
       );
       console.log(matches)
     const { createMatchMaking, isLoading } = useEventsRequest({});
-    
+    console.log(sportDetails)
     const handleGenerateMatchup = async(values:any) =>{
         if(sportDetails.bracketType !== 'Round Robin'){
           values = values?.map((v:any) =>({
@@ -37,7 +38,8 @@ export default function useSportEventHooks({sportDetails}:SportEventInformationP
           }))
         }
         const formData = new FormData();
-        formData.append('sportEventsId',sportDetails.sportsId)
+        formData.append('sportsId',sportDetails.sportsId)
+        formData.append('sportEventsId',sportDetails.sportEventsId)
         formData.append('bracketType',sportDetails.bracketType)
         formData.append('teams',JSON.stringify(values))
         createMatchMaking(formData, {

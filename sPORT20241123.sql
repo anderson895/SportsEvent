@@ -31,7 +31,7 @@ CREATE TABLE `brackets` (
   PRIMARY KEY (`barcketId`),
   KEY `fk_sportsId_idx` (`sportsId`),
   CONSTRAINT `fk_bracket_sports` FOREIGN KEY (`sportsId`) REFERENCES `sports` (`sportsId`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +40,7 @@ CREATE TABLE `brackets` (
 
 LOCK TABLES `brackets` WRITE;
 /*!40000 ALTER TABLE `brackets` DISABLE KEYS */;
-INSERT INTO `brackets` VALUES (1,1,'Single Elimination Bracket',1,'2024-11-16 14:56:43');
+INSERT INTO `brackets` VALUES (1,2,'Single Elimination Bracket',1,'2024-11-22 01:26:23'),(2,1,'Winner Bracket',1,'2024-11-22 01:27:29'),(3,1,'Loser Bracket',1,'2024-11-22 01:27:29'),(4,1,'Final Rematch',1,'2024-11-22 01:27:29');
 /*!40000 ALTER TABLE `brackets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -101,7 +101,7 @@ CREATE TABLE `matches` (
   `eliminationStage` tinyint(4) DEFAULT NULL,
   `venue` longtext DEFAULT NULL,
   PRIMARY KEY (`matchId`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -110,7 +110,7 @@ CREATE TABLE `matches` (
 
 LOCK TABLES `matches` WRITE;
 /*!40000 ALTER TABLE `matches` DISABLE KEYS */;
-INSERT INTO `matches` VALUES (1,1,1,1,2,3,'pending',0,'2024-11-18 16:00:00',NULL,0,5,NULL,0,0,NULL,NULL,NULL,NULL),(2,1,1,1,4,5,'pending',0,'2024-11-19 16:00:00',NULL,0,5,NULL,0,0,NULL,NULL,NULL,NULL),(3,1,1,1,6,7,'pending',0,'2024-11-13 16:00:00',NULL,0,6,NULL,0,0,NULL,NULL,NULL,NULL),(4,1,1,1,8,9,'pending',0,'2024-11-19 16:00:00',NULL,0,6,NULL,0,0,NULL,NULL,NULL,NULL),(5,1,1,2,NULL,NULL,'pending',0,NULL,NULL,0,7,NULL,0,0,NULL,NULL,NULL,NULL),(6,1,1,2,NULL,NULL,'pending',0,NULL,NULL,0,7,NULL,0,0,NULL,NULL,NULL,NULL),(7,1,1,3,NULL,NULL,'pending',0,NULL,NULL,1,NULL,NULL,0,0,NULL,NULL,NULL,NULL);
+INSERT INTO `matches` VALUES (1,1,1,1,2,3,'pending',0,'2024-11-27 16:00:00',NULL,0,5,NULL,0,0,NULL,NULL,NULL,NULL),(2,1,1,1,4,5,'pending',0,'2024-11-26 16:00:00',NULL,0,5,NULL,0,0,NULL,NULL,NULL,NULL),(3,1,1,1,6,7,'pending',0,'2024-11-25 16:00:00',NULL,0,6,NULL,0,0,NULL,NULL,NULL,NULL),(4,1,1,1,8,9,'pending',0,'2024-11-25 16:00:00',NULL,0,6,NULL,0,0,NULL,NULL,NULL,NULL),(5,1,1,2,NULL,NULL,'pending',0,NULL,NULL,0,7,NULL,0,0,NULL,NULL,NULL,NULL),(6,1,1,2,NULL,NULL,'pending',0,NULL,NULL,0,7,NULL,0,0,NULL,NULL,NULL,NULL),(7,1,1,3,NULL,NULL,'pending',0,NULL,NULL,1,NULL,NULL,0,0,NULL,NULL,NULL,NULL),(8,2,2,1,3,2,'pending',0,'2024-11-24 16:00:00',NULL,0,12,13,0,0,NULL,'winners',NULL,NULL),(9,2,2,1,4,5,'completed',5,'2024-11-25 16:00:00',NULL,0,12,13,2,4,NULL,'winners',NULL,NULL),(10,2,2,1,6,8,'pending',0,'2024-11-26 16:00:00',NULL,0,14,15,0,0,NULL,'winners',NULL,NULL),(11,2,2,1,7,9,'pending',0,'2024-11-27 16:00:00',NULL,0,14,15,0,0,NULL,'winners',NULL,NULL),(12,2,2,2,5,NULL,'pending',0,NULL,NULL,0,16,17,0,0,NULL,'winners',NULL,NULL),(13,2,3,1,4,NULL,'pending',0,NULL,NULL,0,17,NULL,0,0,NULL,'losers',NULL,NULL),(14,2,2,2,NULL,NULL,'pending',0,NULL,NULL,0,16,18,0,0,NULL,'winners',NULL,NULL),(15,2,3,1,NULL,NULL,'pending',0,NULL,NULL,0,18,NULL,0,0,NULL,'losers',NULL,NULL),(16,2,2,3,NULL,NULL,'pending',0,NULL,NULL,0,21,20,0,0,NULL,'winners',NULL,NULL),(17,2,3,2,NULL,NULL,'pending',0,NULL,NULL,0,19,NULL,0,0,NULL,'losers',NULL,NULL),(18,2,3,2,NULL,NULL,'pending',0,NULL,NULL,0,19,NULL,0,0,NULL,'losers',NULL,NULL),(19,2,3,3,NULL,NULL,'pending',0,NULL,NULL,0,20,NULL,0,0,NULL,'losers',NULL,NULL),(20,2,3,4,NULL,NULL,'pending',0,NULL,NULL,0,21,NULL,0,0,NULL,'losers',NULL,NULL),(21,2,4,5,NULL,NULL,'pending',0,NULL,NULL,1,NULL,NULL,0,0,NULL,'',NULL,NULL);
 /*!40000 ALTER TABLE `matches` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -213,7 +213,7 @@ CREATE TABLE `sports_events` (
   KEY `fk_eventsFk_idx` (`eventsId`),
   CONSTRAINT `fk_eventsFk` FOREIGN KEY (`eventsId`) REFERENCES `events` (`eventId`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `fk_sportsEve` FOREIGN KEY (`sportsId`) REFERENCES `sports` (`sportsId`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,7 +222,7 @@ CREATE TABLE `sports_events` (
 
 LOCK TABLES `sports_events` WRITE;
 /*!40000 ALTER TABLE `sports_events` DISABLE KEYS */;
-INSERT INTO `sports_events` VALUES (1,1,1,'Single Elimination',NULL,10);
+INSERT INTO `sports_events` VALUES (1,2,1,'Single Elimination',NULL,10),(2,1,1,'Double Elimination',NULL,10);
 /*!40000 ALTER TABLE `sports_events` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -269,7 +269,7 @@ CREATE TABLE `teams_events` (
   `teamWin` int(11) DEFAULT 0,
   `teamLose` int(11) DEFAULT 0,
   PRIMARY KEY (`teamEventId`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -278,7 +278,7 @@ CREATE TABLE `teams_events` (
 
 LOCK TABLES `teams_events` WRITE;
 /*!40000 ALTER TABLE `teams_events` DISABLE KEYS */;
-INSERT INTO `teams_events` VALUES (1,1,'College of Accountancy and Finance',2,2,0,0),(2,1,'College of Arts and Sciences',3,3,0,0),(3,1,'College of Business and Management',4,5,0,0),(4,1,'College of Criminal Justice Education',5,6,0,0),(5,1,'College of Computer Studies',6,7,0,0),(6,1,'College of Health Sciences',7,8,0,0),(7,1,'College of Engineering',8,9,0,0),(8,1,'College of Teacher Education',9,10,0,0);
+INSERT INTO `teams_events` VALUES (1,1,'College of Accountancy and Finance',2,2,0,0),(2,1,'College of Arts and Sciences',3,3,0,0),(3,1,'College of Business and Management',4,5,0,1),(4,1,'College of Criminal Justice Education',5,6,1,0),(5,1,'College of Computer Studies',6,7,0,0),(6,1,'College of Health Sciences',7,8,0,0),(7,1,'College of Engineering',8,9,0,0),(8,1,'College of Teacher Education',9,10,0,0),(9,2,'College of Accountancy and Finance',2,2,0,0),(10,2,'College of Arts and Sciences',3,3,0,0),(11,2,'College of Business and Management',4,5,0,1),(12,2,'College of Criminal Justice Education',5,6,1,0),(13,2,'College of Computer Studies',6,7,0,0),(14,2,'College of Health Sciences',7,8,0,0),(15,2,'College of Engineering',8,9,0,0),(16,2,'College of Teacher Education',9,10,0,0);
 /*!40000 ALTER TABLE `teams_events` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -319,4 +319,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-21 21:34:39
+-- Dump completed on 2024-11-23  9:54:53

@@ -12,13 +12,17 @@ export default function useGameSchedule() {
   const [matchesPerPage] = useState(6);
   const [statusFilter, setStatusFilter] = useState("all");
   const [roundFilter, setRoundFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState<string | null>(null); 
+  const [dateFilter, setDateFilter] = useState<string | null>(null);
+  const [eventFilter, setEventFilter] = useState("all"); 
+  const [sportFilter, setSportFilter] = useState("all"); 
+
   const [isScheduleModalVisible, setScheduleModalVisible] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const [schedule, setSchedule] = useState<string | null>(null);
   const [venue, setVenue] = useState<string>("");
 
   const { data: Match } = useFetchData(["Game"], [GamesServices.gameSchedule]);
+
   const { setMatchingSchedule } = useEventsRequest({
     setIsModalVisible: () => setIsModalVisible(false),
   });
@@ -26,8 +30,14 @@ export default function useGameSchedule() {
   const filteredMatches = Match?.filter((match: any) => {
     const statusMatches = statusFilter === "all" || match.status === statusFilter;
     const roundMatches = roundFilter === "all" || match.round.toString() === roundFilter;
-    const dateMatches = !dateFilter || new Date(match.schedule).toDateString() === new Date(dateFilter).toDateString();
-    return statusMatches && roundMatches && dateMatches;
+    const dateMatches =
+      !dateFilter || new Date(match.schedule).toDateString() === new Date(dateFilter).toDateString();
+    const eventMatches =
+      eventFilter === "all" || match.event?.eventName === eventFilter; 
+    const sportMatches =
+      sportFilter === "all" || match.sport?.sportsName === sportFilter; 
+
+    return statusMatches && roundMatches && dateMatches && eventMatches && sportMatches;
   }).sort((a: any, b: any) => new Date(b.schedule).getTime() - new Date(a.schedule).getTime());
 
   const paginatedMatches = filteredMatches?.slice(
@@ -63,10 +73,24 @@ export default function useGameSchedule() {
     }
   };
 
+  const uniqueEvents = [
+    ...new Map(
+      Match?.map((match: any) => [match.event?.eventId, match.event?.eventName])
+    ).values(),
+  ];
+  const uniqueSports = [
+    ...new Map(
+      Match?.map((match: any) => [match.sportEvent?.sportsId, match.sport?.sportName])
+    ).values(),
+  ];
+
   return {
     Match,
     isFetchingMatch: !Match,
     paginatedMatches,
+    filteredMatches,
+    uniqueEvents, // Unique events for UI dropdowns
+    uniqueSports, // Unique sports for UI dropdowns
     venue,
     schedule,
     isScheduleModalVisible,
@@ -74,14 +98,17 @@ export default function useGameSchedule() {
     isModalVisible,
     roundFilter,
     statusFilter,
-    dateFilter, // Return date filter
+    dateFilter,
+    eventFilter, // Return event filter
+    sportFilter, // Return sport filter
     currentPage,
-    filteredMatches,
     matchesPerPage,
     handleScheduleSubmit,
     setStatusFilter,
     setRoundFilter,
-    setDateFilter, // Return setter for date filter
+    setDateFilter,
+    setEventFilter, // Setter for event filter
+    setSportFilter, // Setter for sport filter
     openScheduleModal,
     handlePageChange,
     setScheduleModalVisible,

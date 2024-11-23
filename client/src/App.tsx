@@ -4,9 +4,9 @@ import { RouterUrl } from "./routes";
 import { CoachSide, Private, Public } from "./layout";
 import {
   AdminDashboard,
-  CoachDashboard,
+  // CoachDashboard,
   CoachTeamPage,
-  CoachTeamStanding,
+  // CoachTeamStanding,
   EventsPage,
   GameResults,
   GameSchedule,
@@ -38,9 +38,9 @@ function App() {
       path: RouterUrl.LandingPage,
       element: <CoachSide />,
       children: [
-        { path: RouterUrl.Coach, element: <CoachDashboard /> },
-        { path: RouterUrl.CoachStanding, element: <CoachTeamStanding /> },
-        { path: RouterUrl.CoachTeam, element: <CoachTeamPage /> },
+        { path: RouterUrl.Coach, element: <CoachTeamPage /> },
+        // { path: RouterUrl.CoachStanding, element: <CoachTeamStanding /> },
+        // { path: RouterUrl.CoachTeam, element: <CoachTeamPage /> },
       ],
     },
     {

@@ -5,7 +5,7 @@ var app = express();
 const { createServer } = require("http");
 const httpServer = createServer(app);
 var bodyparser = require("body-parser");
-const { userRouter, teamsRouter, eventsRouter, sportsRouter, gameRouter } = require("./router/main.router.js");
+const { userRouter, teamsRouter, eventsRouter, sportsRouter, gameRouter, mediaRouter } = require("./router/main.router.js");
 
 const corsOptions = {
     origin: ['http://localhost:5173','http://localhost:5174','http://localhost:5175'], 
@@ -30,6 +30,7 @@ const corsOptions = {
     router.use("/events", eventsRouter);
     router.use("/sports", sportsRouter);
     router.use("/games", gameRouter);
+    router.use("/media", mediaRouter);
   });
   
   app.get("/", async (req, res) => {
