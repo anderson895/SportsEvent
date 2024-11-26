@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Form, message, notification } from 'antd';
-import { useEffect, useState } from 'react';
-import { Sports } from '../../../types';
-import EventsServices from '../../../config/service/events';
-import SportsServices from '../../../config/service/sports';
-import TeamsServices from '../../../config/service/teams';
-import useEventsRequest from '../../../config/data/events';
-import { useFetchData } from '../../../config/axios/requestData';
-import { useQueryClient } from '@tanstack/react-query';
+import { Form, message, notification } from "antd";
+import { useEffect, useState } from "react";
+import { Sports } from "../../../types";
+import EventsServices from "../../../config/service/events";
+import SportsServices from "../../../config/service/sports";
+import TeamsServices from "../../../config/service/teams";
+import useEventsRequest from "../../../config/data/events";
+import { useFetchData } from "../../../config/axios/requestData";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UseInfoHooksParams {
   eventId: string | undefined;
@@ -19,17 +19,23 @@ export default function useInfoHooks({ eventId }: UseInfoHooksParams) {
   const queryClient = useQueryClient();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sportsOptions, setSportsOptions] = useState<Sports[]>([]);
-  const [teamsOptions, setTeamsOptions] = useState<{
-      teamCoach: any; label: string; value: string, teamId: any 
-}[]>([]);
-  const { data: [events, sports, teams] = [], isLoading: isFetching } = useFetchData(
-    ["events", "sports", "teams"],
-    [
-      () => EventsServices.eventInfo(eventId),
-      () => SportsServices.fetchSports(),
-      () => TeamsServices.fetchTeams()
-    ]
-  );
+  const [teamsOptions, setTeamsOptions] = useState<
+    {
+      teamCoach: any;
+      label: string;
+      value: string;
+      teamId: any;
+    }[]
+  >([]);
+  const { data: [events, sports, teams] = [], isLoading: isFetching } =
+    useFetchData(
+      ["events", "sports", "teams"],
+      [
+        () => EventsServices.eventInfo(eventId),
+        () => SportsServices.fetchSports(),
+        () => TeamsServices.fetchTeams(),
+      ]
+    );
 
   const { addSportEventsMutation, isLoading: isAdding } = useEventsRequest({
     setIsModalVisible,
@@ -46,25 +52,32 @@ export default function useInfoHooks({ eventId }: UseInfoHooksParams) {
       const formattedTeams = teams?.map((team: any) => ({
         label: team.teamName,
         value: team.teamId,
-        teamCoach:team.coachId,
-        teamId: team.teamId
+        teamCoach: team.coachId,
+        teamId: team.teamId,
       }));
       setTeamsOptions(formattedTeams);
     }
   }, [sports, teams]);
 
- 
-
   const handleAddSports = async (values: any) => {
     try {
-      const selectedTeams = values.teams?.map((teamId: any) => {
-        const teamData = teamsOptions.find((team) => team.value === teamId);
-        return teamData ? { teamName: teamData.label, teamCoach: teamData.teamCoach, teamId: teamData.teamId } : null;
-      }).filter(Boolean);
+      const selectedTeams = values.teams
+        ?.map((teamId: any) => {
+          const teamData = teamsOptions.find((team) => team.value === teamId);
+          return teamData
+            ? {
+                teamName: teamData.label,
+                teamCoach: teamData.teamCoach,
+                teamId: teamData.teamId,
+              }
+            : null;
+        })
+        .filter(Boolean);
 
-      if (selectedTeams.length !== 8 && (values.bracketType === "Single Elimination" || values.bracketType === "Double Elimination")) {
+      if (selectedTeams.length % 2 !== 0) {
         notification.error({
-          message:"You must select exactly 8 teams for Single or Double Elimination format."
+          message:
+            "You must select an even number of teams for Single Elimination or Round Robin format.",
         });
         return;
       }
@@ -84,17 +97,18 @@ export default function useInfoHooks({ eventId }: UseInfoHooksParams) {
       });
     } catch (error) {
       console.error("Failed to add sports or teams:", error);
-      message.error("An error occurred while adding sports or teams. Please try again.");
+      message.error(
+        "An error occurred while adding sports or teams. Please try again."
+      );
     }
   };
-  console.log(events)
 
   return {
     teams: teamsOptions,
     handleAddSports,
     setIsModalVisible,
     form,
-    info:events,
+    info: events,
     loading: isFetching || isAdding,
     isModalVisible,
     sportsOptions,

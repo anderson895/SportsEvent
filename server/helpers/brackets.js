@@ -348,34 +348,58 @@ const generateDoubleEliminationMatches = async (sportEventsId, firstRoundMatches
       loserRound4MatchId,
       finalWinnerMatchId,
     ]);
-  const [finalMatchResult] = await db
+    const [firstFinalMatchResult] = await db
+    .promise()
+    .query(matchQuery, [
+      sportEventsId,
+      winner_bracket_id, 
+      5,
+      null, 
+      null, 
+      "Pending",
+      null, 
+      null,
+      null, 
+      1, 
+      "final",
+    ]);
+  const firstFinalMatchId = firstFinalMatchResult.insertId;
+  
+  await db
+    .promise()
+    .query("UPDATE matches SET next_match_id = ? WHERE matchId = ?", [
+      firstFinalMatchId,
+      finalWinnerMatchId, 
+    ]);
+  await db
+    .promise()
+    .query("UPDATE matches SET next_match_id = ? WHERE matchId = ?", [
+      firstFinalMatchId,
+      loserRound4MatchId, 
+    ]);
+  
+  const [resetMatchResult] = await db
     .promise()
     .query(matchQuery, [
       sportEventsId,
       final_rematch_bracket_id,
-      5,
+      6, 
       null,
-      null,
+      null, 
       "Pending",
-      null,
-      null,
-      null,
-      1,
-      "final_rematch",
+      null, 
+      null, 
+      null, 
+      1, 
+      "final_rematch", 
     ]);
-  const finalMatchId = finalMatchResult.insertId;
-
+  const resetMatchId = resetMatchResult.insertId;
+  
   await db
     .promise()
     .query("UPDATE matches SET next_match_id = ? WHERE matchId = ?", [
-      finalMatchId,
-      finalWinnerMatchId,
-    ]);
-  await db
-    .promise()
-    .query("UPDATE matches SET next_match_id = ? WHERE matchId = ?", [
-      finalMatchId,
-      loserRound4MatchId,
+      resetMatchId,
+      firstFinalMatchId,
     ]);
 };
 
@@ -460,7 +484,7 @@ const advanceWinnerToNextMatch = async (winnerId, nextMatchId) => {
   }
 };
 
-async function setTeamInNextMatch(matchId, teamId) {
+async function setTeamInNextMatch(matchId, teamId,stat) {
   if (!teamId) {
     console.error("Invalid teamId provided:", teamId);
     return;
@@ -468,28 +492,32 @@ async function setTeamInNextMatch(matchId, teamId) {
 
   try {
     const match = await queryAsync("SELECT team1Id, team2Id FROM matches WHERE matchId = ?", [matchId]);
-    console.log(match)
+
     if (match.length === 0) {
       console.error(`Match with matchId ${matchId} not found.`);
       return;
     }
 
     const { team1Id, team2Id } = match[0];
-
+    
     let updateField;
-    if (team1Id === null) {
+    let statistics;
+    if (team1Id === null || team1Id === 0) {
       updateField = "team1Id";
-    } else if (team2Id === null) {
+      statistics = "team1stat";
+    } else if (team2Id === null || team2Id === 0) {
       updateField = "team2Id";
+      statistics = "team2stat";
     } else {
       console.error(
-        `Both team1Id and team2Id are already set for matchId ${matchId}.`
+        `Both team1Id(${team1Id}) and team2Id(${team2Id}) are already set for matchId ${matchId}.`
       );
       return; 
     }
 
-    const res = await queryAsync(`UPDATE matches SET ${updateField} = ? WHERE matchId = ?`, [
+    const res = await queryAsync(`UPDATE matches SET ${updateField} = ?, ${statistics} = ? WHERE matchId = ?`, [
         teamId,
+        stat,
         matchId,
       ]);
 
@@ -503,51 +531,86 @@ async function setTeamInNextMatch(matchId, teamId) {
 
 
 async function checkForChampion(winnerTeamId, loserTeamId, match) {
-  if (match.isFinal && match.bracketType === "winners") {
-    const losersFinalMatch = await db
+  const matchQuery = `
+  INSERT INTO matches (
+    sportEventsId, 
+    bracketId, 
+    round, 
+    team1Id, 
+    team2Id, 
+    status, 
+    schedule, 
+    next_match_id, 
+    loser_next_match_id, 
+    isFinal, 
+    bracketType
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  if (match.isFinal && match.bracketType === "final") {
+    console.log('checking')
+    if (loserTeamId && ((match.team1stat === "winnerBracket" && match.team1Id === loserTeamId) ||
+    (match.team2stat === "winnerBracket" && match.team2Id === loserTeamId))) {
+      const [existingResetMatch] = await db
       .promise()
       .query(
-        "SELECT * FROM matches WHERE bracketType = 'losers' AND isFinal = 1"
+        "SELECT * FROM matches WHERE isFinal = 1 AND bracketType = 'final_rematch' AND matchId = ?",
+        [match.next_match_id]
       );
+    
 
-    if (
-      losersFinalMatch.length === 1 &&
-      losersFinalMatch[0].winner_team_id === loserTeamId
-    ) {
-      const existingResetMatch = await db
-        .promise()
-        .query(
-          "SELECT * FROM matches WHERE isFinal = 1 AND bracketType = 'reset'"
-        );
+      if (existingResetMatch.length > 0) {
 
-      if (existingResetMatch.length === 0) {
+        const resetMatch = existingResetMatch[0];
+        if (
+          (match.team1stat === "winnerBracket" && match.team1Id === loserTeamId) ||
+          (match.team2stat === "winnerBracket" && match.team2Id === loserTeamId)
+        ) {
+          console.log('here',loserTeamId)
+          await db.promise().query(
+            "UPDATE matches SET team2Id = ? WHERE matchId = ?",
+            [loserTeamId, resetMatch.matchId]
+          );
+          console.log(
+            `Updated team2Id in reset match (ID: ${resetMatch.matchId}) with team from Winner Bracket.`
+          );
+        }
+      } else {
+        const [resetMatchResult] = await db.promise().query(matchQuery, [
+          match.sportEventsId, 
+          6, 
+          match.round + 1, 
+          loserTeamId,
+          winnerTeamId, 
+          "Pending", 
+          null, 
+          null, 
+          null,
+          1,
+          "final_rematch", 
+        ]);
+
+        const resetMatchId = resetMatchResult.insertId;
+
         await db
           .promise()
           .query(
-            "INSERT INTO matches (sportEventsId, bracketId, round, team1Id, team2Id, status, isFinal, bracketType) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [
-              match.sportEventsId,
-              match.bracketId,
-              match.round + 1,
-              loserTeamId,
-              winnerTeamId,
-              "Pending",
-              1,
-              "reset",
-            ]
+            "UPDATE matches SET loser_next_match_id = ? WHERE matchId = ?",
+            [resetMatchId, match.matchId]
           );
-        return null; 
-      } else {
-        return null; 
+
+        console.log(`Reset match created with ID: ${resetMatchId}`);
       }
+    } else {
+      return winnerTeamId; 
     }
   }
 
-  if (match.bracketType === "reset" && match.isFinal) {
-    return winnerTeamId; 
+  if (match.isFinal && match.bracketType === "final_rematch") {
+    return winnerTeamId;
   }
 
-  return null;
+  return null; 
 }
 
 const updateTeamStanding = async (winnerTeamId, loserTeamId) => {

@@ -2,73 +2,76 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import "swiper/css/effect-coverflow";
-import "swiper/css/pagination";
 import "swiper/css/navigation";
-import "./index.css"; 
-
-import { EffectCoverflow, Pagination, Navigation } from "swiper/modules";
+import "swiper/css/pagination";
+import { Navigation, Pagination } from "swiper/modules";
 
 interface SwiperCarouselProps {
   items: any[];
-  onButtonClick: (mediaId: number) => void; 
+  onButtonClick: (mediaId: number) => void;
 }
 
-const SwiperCarousel: React.FC<SwiperCarouselProps> = ({ items, onButtonClick }) => {
+const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
+  items,
+  onButtonClick,
+}) => {
   return (
-    <div className="swiper-container" style={{ width: "100%", margin: "auto" }}>
+    <div className="relative w-full">
       <Swiper
-        effect="coverflow"
-        grabCursor={true}
-        centeredSlides={true}
-        slidesPerView="auto"
-        coverflowEffect={{
-          rotate: 0,
-          stretch: 0,
-          depth: 200,
-          modifier: 1.5,
-          slideShadows: true,
-        }}
-        pagination={{ clickable: true }}
+        modules={[Navigation, Pagination]}
+        spaceBetween={20}
+        slidesPerView={3}
         navigation
-        modules={[EffectCoverflow, Pagination, Navigation]}
+        pagination={{ clickable: true }}
+        style={{ padding: "1rem 0" }}
       >
         {items.map((item, index) => (
-          <SwiperSlide key={index} className="swiper-slide-custom">
-            <div className="slide-content">
+          <SwiperSlide key={index}>
+            <div className="w-full bg-white border border-gray-200 rounded-lg shadow-md p-4">
+              {/* Media (Video/Image) */}
               {item.type === "video" ? (
                 <video
                   src={item.media}
                   controls
-                  className="slide-video"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    borderRadius: "15px",
-                  }}
+                  className="w-full h-48 rounded-lg object-cover mb-4"
+                  onError={(e: any) =>
+                    (e.target.style.display = "none") // Fallback for failed video load
+                  }
                 />
               ) : (
                 <img
                   src={item.media}
                   alt={`Slide ${index + 1}`}
-                  className="slide-image"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    borderRadius: "15px",
-                  }}
+                  className="w-full h-48 rounded-lg object-cover mb-4"
+                  onError={(e: any) =>
+                    (e.target.src =
+                      "https://via.placeholder.com/400?text=Image+Not+Available") // Fallback for failed image load
+                  }
                 />
               )}
-              <div className="slide-overlay">
-                <button
-                  className="slide-button"
-                  onClick={() => onButtonClick(item.mediaId)} 
-                >
-                  {item.buttonText}
-                </button>
+
+              {/* Metadata Section */}
+              <div className="mb-4">
+                {item.title && (
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">
+                    {item.title}
+                  </h3>
+                )}
+                {item.description && (
+                  <p className="text-sm text-gray-600">{item.description}</p>
+                )}
+                {item.author && item.author !== "undefined" && (
+                  <p className="text-xs text-gray-500">By {item.author}</p>
+                )}
               </div>
+
+              {/* Action Button */}
+              <button
+                className="w-full bg-red-500 text-white font-bold py-2 rounded-lg hover:bg-red-600 transition duration-200"
+                onClick={() => onButtonClick(item.mediaId)}
+              >
+                {item.buttonText}
+              </button>
             </div>
           </SwiperSlide>
         ))}

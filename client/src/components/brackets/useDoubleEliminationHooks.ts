@@ -28,6 +28,15 @@ export default function useDoubleEliminationHooks({ matches, teams }: DoubleElim
     return acc;
   }, {} as { [key: number]: Match[] });
 
+  const finalRound = (matches ?? []).filter((match) => match.bracketType === 'final').reduce((acc, match) => {
+    acc[match.round] = acc[match.round] ? [...acc[match.round], match] : [match];
+    return acc;
+  }, {} as { [key: number]: Match[] });
+  const finalRematchRound = (matches ?? []).filter((match) => match.bracketType === 'final_rematch').reduce((acc, match) => {
+    acc[match.round] = acc[match.round] ? [...acc[match.round], match] : [match];
+    return acc;
+  }, {} as { [key: number]: Match[] });
+
   const findTeamById = (id: number | null): Team | null => (teams ?? []).find((team) => team.teamId === id) || null;
 
   const handleMatchClick = (match: Match) => {
@@ -75,9 +84,24 @@ export default function useDoubleEliminationHooks({ matches, teams }: DoubleElim
     }
   };
 
-  const finalMatch = matches?.find((match) => match.isFinal && match.status === "completed");
-  const championTeam = finalMatch ? findTeamById(finalMatch.winner_team_id) : null;
-  const finalMatchBrackets = matches?.find((match) => match.bracketType !== 'losers' && match.bracketType !== 'winners');
+  const finalRematchMatch = matches?.find(
+    (match) => match.bracketType === "final_rematch" && match.isFinal
+  );
+  
+  const finalMatch = matches?.find(
+    (match) => match.bracketType === "final" && match.isFinal && match.status === "completed"
+  );
+  
+  const championTeam = finalRematchMatch && finalRematchMatch.status !== "completed"
+    ? null 
+    : finalRematchMatch && finalRematchMatch.status === "completed"
+    ? findTeamById(finalRematchMatch.winner_team_id) 
+    : finalMatch
+    ? findTeamById(finalMatch.winner_team_id) 
+    : null;
+  
+  
+  const finalMatchBrackets = matches?.filter((match) => match.bracketType !== 'losers' && match.bracketType !== 'winners');
   return {
     modalState,
     scores,
@@ -87,6 +111,8 @@ export default function useDoubleEliminationHooks({ matches, teams }: DoubleElim
     winnersRounds,
     losersRounds,
     finalMatchBrackets,
+    finalRound,
+    finalRematchRound,
     setScores,
     setSchedule,
     setModalState,

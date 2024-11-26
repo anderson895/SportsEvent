@@ -26,7 +26,7 @@ module.exports = {
       } = data;
       await queryAsync(
         "INSERT INTO events (eventName, eventYear, eventstartDate, eventendDate,description) VALUES (?, ?, ?, ?, ?)",
-        [eventName, eventYear, eventstartDate, eventendDate, description]
+        [eventName, eventYear, new Date(eventstartDate), new Date(eventendDate), description]
       );
       return { success: 1, message: "Event created" };
     } catch (error) {
@@ -60,8 +60,8 @@ module.exports = {
         [
           eventName,
           eventYear,
-          eventstartDate,
-          eventendDate,
+          new Date(eventstartDate),
+          new Date(eventendDate),
           description,
           eventId,
         ]
@@ -276,7 +276,7 @@ module.exports = {
 
   doubleSetWinner: async (data) => {
     const { team1Score, team2Score, matchId } = data;
-    
+  
     try {
       const matchResult = await queryAsync(
         "SELECT * FROM matches WHERE matchId = ?",
@@ -284,7 +284,7 @@ module.exports = {
       );
       if (matchResult.length === 0)
         return { success: 0, message: "Match not found" };
-
+  
       const match = matchResult[0];
       const {
         team1Id,
@@ -294,7 +294,7 @@ module.exports = {
         loser_next_match_id,
         isFinal,
       } = match;
-
+  
       let winnerTeamId, loserTeamId;
       if (team1Score > team2Score) {
         winnerTeamId = team1Id;
@@ -308,30 +308,34 @@ module.exports = {
           message: "Scores cannot be equal in elimination matches.",
         };
       }
-
+  
       await queryAsync(
         "UPDATE matches SET team1Score = ?, team2Score = ?, winner_team_id = ?, status = 'completed' WHERE matchId = ?",
         [team1Score, team2Score, winnerTeamId, matchId]
       );
-
+  
       await updateTeamStanding(winnerTeamId, loserTeamId);
-
+  
       if (next_match_id) {
         console.log(`Updating winner to next match: ${next_match_id}`);
-        await setTeamInNextMatch(next_match_id, winnerTeamId);
+        if(bracketType === 'winners'){
+          await setTeamInNextMatch(next_match_id, winnerTeamId,'winnerBracket');
+        } else {
+          await setTeamInNextMatch(next_match_id, winnerTeamId,'loserBracket');
+        }
       }
   
       if (loser_next_match_id) {
         console.log(`Updating loser to next match: ${loser_next_match_id}`);
-        await setTeamInNextMatch(loser_next_match_id, loserTeamId);
+        await setTeamInNextMatch(loser_next_match_id, loserTeamId,'loser');
       }
+  
       
-
       const champion = await checkForChampion(winnerTeamId, loserTeamId, match);
       if (champion) {
         return { success: 1, message: "Champion decided", champion };
       }
-
+  
       return {
         success: 1,
         message: "Winner set and progression updated successfully.",
@@ -344,6 +348,7 @@ module.exports = {
       };
     }
   },
+  
   roundSetWinner: async (data) => {
     let { team1Score, team2Score, matchId } = data;
     team1Score = Number(team1Score);
@@ -418,7 +423,7 @@ module.exports = {
 
       await queryAsync(
         'UPDATE matches SET schedule = ?, status = "Scheduled", venue = ? WHERE matchId = ?',
-        [schedule, venue, matchId]
+        [new Date(schedule), venue, matchId]
       );
 
       return { success: 1, message: "Match schedule updated successfully." };
@@ -472,7 +477,6 @@ module.exports = {
           sportDescription,
         } = row;
 
-        // Find or create the event entry
         let event = acc.find((e) => e.eventId === eventId);
         if (!event) {
           event = {
@@ -488,7 +492,6 @@ module.exports = {
           acc.push(event);
         }
 
-        // If there are sports events, add them to the event's sportsEvents array
         if (sportEventsId) {
           event.sportsEvents.push({
             sportEventsId,

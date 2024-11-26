@@ -24,14 +24,15 @@ const FirstSection = () => {
       (prevIndex) => (prevIndex - 1 + images.length) % images.length
     );
   };
-
+    
   return (
     <section
+      id="home"
       className="h-screen w-full bg-center bg-no-repeat bg-cover relative"
       style={{ backgroundImage: `url('${images[currentIndex]}')` }}
     >
       <div className="w-full bg-customBlack/70 h-full pt-12 md:pt-24 pl-8 md:pl-52 line">
-        <div className="border w-max flex flex-col gap-12 mt-20">
+        <div className="w-max flex flex-col gap-12 mt-20">
           <h1 className="text-white w-[50%] font-extrabold text-xl md:text-6xl">
             Experience the Thrill of Live Sports Events
           </h1>

@@ -45,6 +45,8 @@ export interface BracketType {
 }
 
 export interface Match {
+  team1Score: number | null;
+  team2Score: number | null;
   bracketType: string;
   matchId: number;
   round: number;

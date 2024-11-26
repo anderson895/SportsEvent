@@ -23,7 +23,6 @@ export default function useEventsHooks() {
       () => EventsServices.fetchEvents(),
     ]
   );
-  console.log(Events)
   const handleAddOrEditEvent = (values: Events) => {
     const formData = new FormData();
     formData.append("eventName", values.eventName);

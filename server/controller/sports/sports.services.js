@@ -89,14 +89,13 @@ module.exports = {
   },
   fetchAllData: async () => {
     try {
-      // Fetch events
       const events = await queryAsync(`
         SELECT eventId, eventName, eventYear, eventstartDate, eventendDate, description
         FROM events
       `);
 
       const media = await queryAsync(`
-        SELECT mediaId, url, type, createdAt
+        SELECT *
         FROM media
       `);
 
@@ -108,15 +107,13 @@ module.exports = {
         SELECT *
         FROM users where type = 'Coach'
       `);
-  
-      // Fetch Teams with Coaches
+
       const teams = await queryAsync(`
         SELECT t.teamId, t.teamName, t.teamLogo, t.dateAdded, u.username AS coachName
         FROM teams t
         LEFT JOIN users u ON t.teamCoach = u.id
       `);
-  
-      // For each event, fetch its related sports events
+
       const eventPromises = events.map(async (event) => {
         const sportsEvents = await queryAsync(
           `
@@ -127,34 +124,37 @@ module.exports = {
   s.sportsLogo,
   se.bracketType,
   se.maxPlayers,
-  GROUP_CONCAT(
-    CONCAT(
-      '{"teamEventId":', te.teamEventId,
-      ',"teamName":"', te.teamName,
-      '","teamWin":', IFNULL(te.teamWin, 0),
-      ',"teamLose":', IFNULL(te.teamLose, 0),
-      ',"players":[', 
-        COALESCE(
-          (
-            SELECT GROUP_CONCAT(
-              CONCAT(
-                '{"playerId":', p.playerId,
-                ',"playerName":"', p.playerName,
-                '","position":"', p.position,
-                '","medicalCertificate":"', p.medicalCertificate, '"}'
-              )
-            ) 
-            FROM players p 
-            WHERE p.teamEventId = te.teamEventId
-          ),
-          ''
-        ), 
-      ']}'
-    )
-  ) AS participatingTeams
+ GROUP_CONCAT(
+  CONCAT(
+    '{"teamEventId":', te.teamEventId,
+    ',"teamName":"', REPLACE(te.teamName, '"', '\"'), '",', -- Escape quotes in teamName
+    '"teamLogo":"', REPLACE(t.teamLogo, '"', '\"'), '",',  -- Escape quotes in teamLogo
+    '"teamId":"', REPLACE(t.teamId, '"', '\"'), '",',  -- Escape quotes in teamId
+    '"teamWin":', IFNULL(te.teamWin, 0), ',',
+    '"teamLose":', IFNULL(te.teamLose, 0), ',',
+    '"players":[', 
+      COALESCE(
+        (
+          SELECT GROUP_CONCAT(
+            CONCAT(
+              '{"playerId":', p.playerId,
+              ',"playerName":"', REPLACE(p.playerName, '"', '\"'), '",',
+              '"position":"', REPLACE(p.position, '"', '\"'), '",',
+              '"medicalCertificate":"', REPLACE(p.medicalCertificate, '"', '\"'), '"}'
+            )
+          )
+          FROM players p 
+          WHERE p.teamEventId = te.teamEventId
+        ),
+        ''
+      ),
+    ']}'
+  )
+) AS participatingTeams
 FROM sports_events se
 LEFT JOIN sports s ON se.sportsId = s.sportsId
 LEFT JOIN teams_events te ON se.sportEventsId = te.sportEventsId
+ LEFT JOIN teams t ON te.teamId = t.teamId
 WHERE se.eventsId = 1
 GROUP BY se.sportEventsId;
         `,
@@ -168,20 +168,20 @@ GROUP BY se.sportEventsId;
             : [],
         }));
 
-        // Fetch matches related to each sport event
         const matchPromises = parsedSportsEvents.map(async (sportEvent) => {
           const matches = await queryAsync(
             `
             SELECT 
-              m.matchId, m.round, m.schedule, m.status, 
-              t1.teamName AS team1Name, t2.teamName AS team2Name,
+              *, 
+              t1.teamName AS team1Name, t1.teamLogo AS team1Logo,
+              t2.teamName AS team2Name, t2.teamLogo AS team2Logo,
               m.team1Score, m.team2Score, m.winner_team_id,
               m.roundType, m.bracketType, m.eliminationStage
             FROM matches m
             LEFT JOIN teams t1 ON m.team1Id = t1.teamId
             LEFT JOIN teams t2 ON m.team2Id = t2.teamId
             WHERE m.sportEventsId = ?
-          `,
+            `,
             [sportEvent.sportEventsId]
           );
 
@@ -204,7 +204,7 @@ GROUP BY se.sportEventsId;
           media,
           teams,
           sports,
-          coach
+          coach,
         },
         message: "All data fetched successfully",
       };

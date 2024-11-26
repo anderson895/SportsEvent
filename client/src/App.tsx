@@ -22,6 +22,7 @@ import {
   UserAccounts,
 } from "./pages";
 import EventInformation from "./pages/private/events/information";
+import LiveMatch from "./pages/public/live";
 
 function App() {
   const router = createBrowserRouter([
@@ -32,6 +33,7 @@ function App() {
         { path: RouterUrl.LandingPage, element: <LandingPage /> },
         { path: RouterUrl.Login, element: <LoginPage /> },
         { path: RouterUrl.Registration, element: <RegistrationPage /> },
+        { path: RouterUrl.Live, element: <LiveMatch /> },
       ],
     },
     {

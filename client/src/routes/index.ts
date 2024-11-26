@@ -2,6 +2,7 @@ export const RouterUrl = {
     LandingPage:'/',
     Registration:'/registration',
     Login:'/login',
+    Live:'/live/:eventName/:sportName/:matchId/:team1/vs/:team2',
     AdminDashboard:'/Dashboard',
     AdminTeams:'/Teams',
     AdminTeamsInfo:'/Teams/:teamId?',

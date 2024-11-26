@@ -3,22 +3,30 @@ import React, { useEffect, ReactNode } from "react";
 import { motion, useAnimation, Variants } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
-// Props for the AnimatedComponent
 type AnimatedComponentProps = {
-  variants: Variants; // Animation variants
-  children: ReactNode; // Content to wrap
+  variants: Variants; 
+  children: ReactNode; 
+  stagger?: boolean;
+  className?: string; 
 };
 
-// Main AnimatedComponent
-const AnimatedComponent: React.FC<AnimatedComponentProps> = ({ variants, children }) => {
+const AnimatedComponent: React.FC<AnimatedComponentProps> = ({
+  variants,
+  children,
+  stagger = false,
+  className = "",
+}) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({
-    threshold: 0.2, // Trigger animation when 20% of the component is in view
+    threshold: 0.2, 
+    triggerOnce: false, 
   });
 
   useEffect(() => {
     if (inView) {
       controls.start("visible");
+    } else {
+      controls.start("hidden");
     }
   }, [controls, inView]);
 
@@ -27,16 +35,16 @@ const AnimatedComponent: React.FC<AnimatedComponentProps> = ({ variants, childre
       ref={ref}
       initial="hidden"
       animate={controls}
-      variants={variants}
+      variants={stagger ? parentVariant : variants}
+      className={stagger ? className : undefined}
     >
       {children}
     </motion.div>
   );
 };
 
-// Dynamic Slide-In Variant Generator
 const createSlideInVariant = (direction: "left" | "right" | "up" | "down"): Variants => {
-  const distance = 100; // Distance to slide (in pixels)
+  const distance = 100;
   const directions = {
     left: { x: -distance, y: 0 },
     right: { x: distance, y: 0 },
@@ -50,7 +58,6 @@ const createSlideInVariant = (direction: "left" | "right" | "up" | "down"): Vari
   };
 };
 
-// Other Variants
 const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.8 } },
@@ -66,4 +73,29 @@ const rotateIn: Variants = {
   visible: { opacity: 1, rotate: 0, transition: { duration: 0.8 } },
 };
 
-export { AnimatedComponent, fadeIn, scaleUp, rotateIn, createSlideInVariant };
+const parentVariant: Variants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.3, 
+    },
+  },
+};
+
+const childVariant: Variants = {
+  hidden: { opacity: 0, y: 20 }, 
+  visible: { opacity: 1, y: 0, transition: { duration: 2 } }, 
+};
+
+export {
+  AnimatedComponent,
+  fadeIn,
+  scaleUp,
+  rotateIn,
+  createSlideInVariant,
+  parentVariant,
+  childVariant,
+};

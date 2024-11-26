@@ -149,6 +149,9 @@ export const GameScoring = () => {
                 <p className="font-semibold text-center mt-2">
                   {match.team1?.teamName || "Team 1"}
                 </p>
+                <p className="text-center font-bold">
+                  Score: {match.team1Score !== undefined ? match.team1Score : "N/A"}
+                </p>
               </div>
               <p className="text-xl font-bold mx-2">VS</p>
               <div className="flex flex-col items-center mx-4">
@@ -159,6 +162,9 @@ export const GameScoring = () => {
                 />
                 <p className="font-semibold text-center mt-2">
                   {match.team2?.teamName || "Team 2"}
+                </p>
+                <p className="text-center font-bold">
+                  Score: {match.team2Score !== undefined ? match.team2Score : "N/A"}
                 </p>
               </div>
             </div>

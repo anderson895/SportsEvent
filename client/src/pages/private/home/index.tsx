@@ -4,8 +4,10 @@ import { useFetchData } from "../../../config/axios/requestData";
 import SportsServices from "../../../config/service/sports";
 import { CustomAutoPlaySwiper } from "../../../components/swiper/autoplay";
 import { CustomVideoSwiper } from "../../../components/swiper/custom";
+import { useNavigate } from "react-router-dom";
 
 export const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate()
   const { data: [summary] = [], isPending } = useFetchData(
     ["summary"],
     [() => SportsServices.fetchSportsSummary()]
@@ -23,7 +25,7 @@ export const AdminDashboard: React.FC = () => {
   const selectedEventData = summary?.events?.find(
     (event: any) => event.eventId === parseInt(selectedEvent)
   );
-  console.log(selectedEventData)
+  console.log(selectedEventData?.sportEvents)
   return (
     <div className="p-6 min-h-screen">
       {/* Header Section */}
@@ -42,20 +44,27 @@ export const AdminDashboard: React.FC = () => {
           ))}
         </select>
       </div>
-      {/* <CustomCarousel slides={summary?.media?.filter((x:any) => x.type === 'image')?.map((v:any) =>({
-          id:v.mediaId,
-          image:v.url
-        }))}  /> */}
       {/* Media Section */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold mb-4">Media</h2>
 
         <div className="grid grid-cols-5 gap-4">
           <div className="col-span-3">
-            <CustomAutoPlaySwiper height="300px" images={summary?.media?.filter((x:any) => x.type === 'image')?.map((v:any) => v.url)}  />
+            <CustomAutoPlaySwiper
+              height="300px"
+              images={summary?.media
+                ?.filter((x: any) => x.type === "image")
+                ?.map((v: any) => v.url)}
+            />
           </div>
           <div className="col-span-2">
-          <CustomVideoSwiper width="100%" height="300px" videos={summary?.media?.filter((x:any) => x.type === 'video')?.map((v:any) => v.url)}  />
+            <CustomVideoSwiper
+              width="100%"
+              height="300px"
+              videos={summary?.media
+                ?.filter((x: any) => x.type === "video")
+                ?.map((v: any) => v.url)}
+            />
           </div>
         </div>
       </div>
@@ -96,13 +105,12 @@ export const AdminDashboard: React.FC = () => {
                 className="w-full h-32 object-cover mb-4"
               />
               <h3 className="font-semibold">{sport.sportsName}</h3>
-              <div dangerouslySetInnerHTML={{__html:sport.description}}  />
+              <div dangerouslySetInnerHTML={{ __html: sport.description }} />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Selected Event Section */}
       {selectedEventData && (
         <div>
           <h2 className="text-lg font-semibold mb-4">
@@ -112,66 +120,84 @@ export const AdminDashboard: React.FC = () => {
           {/* Sport Events */}
           <h3 className="text-md font-semibold mb-4">Sport Events</h3>
           {selectedEventData.sportsEvents?.map((sportEvent: any) => (
-            <div key={sportEvent.sportEventsId} className="mb-4">
-              <h4 className="font-semibold">
+            <div key={sportEvent.sportEventsId} className="mb-8">
+              <h4 className="font-semibold text-lg text-gray-800">
                 {sportEvent.sportsName} - {sportEvent.bracketType}
               </h4>
-              <p>Max Players: {sportEvent.maxPlayers}</p>
-              <div className="grid grid-cols-2 gap-4 mt-4">
+              <p className="text-gray-600 text-sm">
+                Max Players: {sportEvent.maxPlayers}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
                 {sportEvent.participatingTeams.map((team: any) => (
                   <div
                     key={team.teamEventId}
-                    className="rounded-md bg-gray-100 p-4"
+                    className="relative rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 p-6"
                   >
-                    <h5 className="font-semibold">{team.teamName}</h5>
-                    <p>Wins: {team.teamWin}</p>
-                    <p>Losses: {team.teamLose}</p>
-                    <h6 className="font-semibold mt-2">Players:</h6>
-                    <ul className="list-disc pl-5">
-                      {team.players?.map((player: any) => (
-                        <li key={player.playerId}>
-                          {player.playerName} - {player.position}
-                        </li>
-                      ))}
-                    </ul>
+                    {/* Team Info */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <img
+                        src={team.teamLogo}
+                        alt={team.teamName}
+                        className="w-16 h-16 rounded-full border border-gray-300"
+                      />
+                      <div>
+                        <h5 className="font-semibold text-gray-800">
+                          {team.teamName}
+                        </h5>
+                        <p className="text-sm text-gray-600">
+                          Wins:{" "}
+                          <span className="font-bold text-green-600">
+                            {team.teamWin}
+                          </span>
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Losses:{" "}
+                          <span className="font-bold text-red-600">
+                            {team.teamLose}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Players */}
+                    <div className="mt-4">
+                      <h6 className="font-semibold text-gray-700 mb-2">
+                        Players:
+                      </h6>
+                      <ul className="list-disc pl-6 space-y-1">
+                        {team.players?.length > 0 ? (
+                          team.players.map((player: any) => (
+                            <li
+                              key={player.playerId}
+                              className="text-sm text-gray-600 flex justify-between"
+                            >
+                              <span>{player.playerName}</span>
+                              <span className="italic text-gray-500">
+                                {player.position}
+                              </span>
+                            </li>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            No players listed
+                          </p>
+                        )}
+                      </ul>
+                    </div>
+
+                    {/* Call to Action */}
+                    <div className="mt-6 text-center">
+                      <button onClick={() =>navigate(`/Teams/${team.teamId}`)} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        View Team Details
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           ))}
 
-          {/* Matches */}
-          <h3 className="text-md font-semibold mb-4">Matches</h3>
-          <div className="grid grid-cols-2 gap-4">
-            {selectedEventData.sportEvents
-              ?.flatMap((sportEvent: any) => sportEvent.matches || [])
-              .map((match: any) => (
-                <div
-                  key={match.matchId}
-                  className="rounded-md bg-gray-100 p-4 shadow-md"
-                >
-                  <p>
-                    <strong>Round:</strong> {match.round}
-                  </p>
-                  <p>
-                    <strong>Schedule:</strong> {new Date(
-                      match.schedule
-                    ).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Teams:</strong> {match.team1Name} vs{" "}
-                    {match.team2Name}
-                  </p>
-                  <p>
-                    <strong>Score:</strong> {match.team1Score} -{" "}
-                    {match.team2Score}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {match.status}
-                  </p>
-                </div>
-              ))}
-          </div>
+
         </div>
       )}
     </div>

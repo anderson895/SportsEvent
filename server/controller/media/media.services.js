@@ -6,16 +6,19 @@ const queryAsync = util.promisify(pool.query).bind(pool);
 module.exports ={
     uploadFile:async(data) =>{
         try {
-            const { media, type } = data;
+            const { media, type,title,description,author } = data;
             if (!media || !type) {
               return { success:0,message: "File and type are required." }
             }
         
             const fileUrl = await uploadImage(media, media.originalname);
         
-            const insertResult = await queryAsync("INSERT INTO media (url, type) VALUES (?, ?)", [
+            const insertResult = await queryAsync("INSERT INTO media (url, type,title,description,author) VALUES (?, ?,?,?,?)", [
               fileUrl,
               type,
+              title,
+              description,
+              author
             ]);
         
             return {
@@ -42,7 +45,8 @@ module.exports ={
             const { mediaId } = data;
         
             const media = await queryAsync("SELECT * FROM media WHERE mediaId = ?", [mediaId]);
-        
+            console.log(data)
+            console.log(mediaId)
             if (media.length === 0) {
               return { success:0, message: "Media not found." }
             }

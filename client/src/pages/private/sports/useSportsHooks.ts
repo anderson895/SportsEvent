@@ -22,7 +22,6 @@ export default function useSportsHooks() {
     ["Sports"],
     [() => SportsServices.fetchSports()]
   );
-  console.log(Sports)
   const handleAddOrEditTeam = (values: Sports) => {
     const formData = new FormData();
     if (!isImageUpdated && editingSports?.sportsLogo) {
@@ -42,7 +41,7 @@ export default function useSportsHooks() {
     formData.append("description", values.description);
     formData.append("sportsLogo", values.sportsLogo);
     if(editingSports){
-        formData.append("teamId", editingSports.sportsId.toString());
+        formData.append("sportsId", editingSports.sportsId.toString());
     }
     const mutation = editingSports ? editSportMutation : addSportMutation;
     mutation(formData, {

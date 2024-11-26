@@ -1,5 +1,4 @@
 import { Button, Form, Input } from 'antd';
-import { Link } from 'react-router-dom';
 import useLogin from './useLogin';
 
 export const LoginPage = () => {
@@ -29,9 +28,7 @@ export const LoginPage = () => {
             >
               Login
             </Button>
-            <p className="text-center mt-4">
-              Don't have an account? <Link to="/registration" className="text-blue-500">Register</Link>
-            </p>
+        
           </Form>
         </div>
       </div>

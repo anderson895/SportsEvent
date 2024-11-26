@@ -5,7 +5,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 
-// Import required modules
 import {
   EffectCreative,
   Navigation,
@@ -21,8 +20,8 @@ interface CustomSwiperProps {
 
 export const CustomAutoPlaySwiper: React.FC<CustomSwiperProps> = ({
   images,
-  width = "100%", // default width
-  height = "200px", // default height
+  width = "100%",
+  height = "200px",
 }) => {
   return (
     <Swiper
