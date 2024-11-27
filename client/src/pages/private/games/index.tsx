@@ -64,7 +64,7 @@ export const GameScoring = () => {
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">Game Schedule</h1>
+      <h1 className="text-2xl font-bold mb-4">Game Scoring</h1>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-4 mb-4">

@@ -122,18 +122,6 @@ const LiveMatch = () => {
             </p>
           </div>
 
-          {/* Live Indicator */}
-          {matchInfo.status === "ongoing" ? (
-            <div className="text-center">
-              <button className="bg-red-600 text-white px-6 py-2 rounded-lg shadow-lg hover:bg-red-700 transform hover:scale-105 transition duration-200">
-                Watch Live
-              </button>
-            </div>
-          ) : (
-            <p className="text-center text-gray-500">
-              Match is not currently live.
-            </p>
-          )}
         </div>
       </main>
       <footer className="bg-gray-800 text-white text-center py-4" id="contact">

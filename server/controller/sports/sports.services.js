@@ -114,60 +114,62 @@ module.exports = {
         LEFT JOIN users u ON t.teamCoach = u.id
       `);
 
-      const eventPromises = events.map(async (event) => {
+      const eventPromises = events.map(async (event, idx) => {
         const sportsEvents = await queryAsync(
           `
-     SELECT 
-  se.sportEventsId,
-  se.eventsId,
-  s.sportsName,
-  s.sportsLogo,
-  se.bracketType,
-  se.maxPlayers,
- GROUP_CONCAT(
-  CONCAT(
-    '{"teamEventId":', te.teamEventId,
-    ',"teamName":"', REPLACE(te.teamName, '"', '\"'), '",', -- Escape quotes in teamName
-    '"teamLogo":"', REPLACE(t.teamLogo, '"', '\"'), '",',  -- Escape quotes in teamLogo
-    '"teamId":"', REPLACE(t.teamId, '"', '\"'), '",',  -- Escape quotes in teamId
-    '"teamWin":', IFNULL(te.teamWin, 0), ',',
-    '"teamLose":', IFNULL(te.teamLose, 0), ',',
-    '"players":[', 
-      COALESCE(
-        (
-          SELECT GROUP_CONCAT(
-            CONCAT(
-              '{"playerId":', p.playerId,
-              ',"playerName":"', REPLACE(p.playerName, '"', '\"'), '",',
-              '"position":"', REPLACE(p.position, '"', '\"'), '",',
-              '"medicalCertificate":"', REPLACE(p.medicalCertificate, '"', '\"'), '"}'
-            )
-          )
-          FROM players p 
-          WHERE p.teamEventId = te.teamEventId
-        ),
-        ''
-      ),
-    ']}'
-  )
-) AS participatingTeams
-FROM sports_events se
-LEFT JOIN sports s ON se.sportsId = s.sportsId
-LEFT JOIN teams_events te ON se.sportEventsId = te.sportEventsId
- LEFT JOIN teams t ON te.teamId = t.teamId
-WHERE se.eventsId = 1
-GROUP BY se.sportEventsId;
-        `,
-          [event.eventId]
+          SELECT 
+            se.sportEventsId,
+            se.eventsId,
+            s.sportsName,
+            s.sportsLogo,
+            se.bracketType,
+            se.maxPlayers,
+            GROUP_CONCAT(DISTINCT
+              CONCAT(
+                '{"teamEventId":', te.teamEventId,
+                ',"teamName":"', REPLACE(te.teamName, '"', '\"'), '",',
+                '"teamLogo":"', REPLACE(t.teamLogo, '"', '\"'), '",',
+                '"teamId":"', REPLACE(t.teamId, '"', '\"'), '",',
+                '"teamWin":', IFNULL(te.teamWin, 0), ',',
+                '"teamLose":', IFNULL(te.teamLose, 0), ',',
+                '"players":[', 
+                  COALESCE(
+                    (
+                      SELECT GROUP_CONCAT(DISTINCT
+                        CONCAT(
+                          '{"playerId":', p.playerId,
+                          ',"playerName":"', REPLACE(p.playerName, '"', '\"'), '",',
+                          '"position":"', REPLACE(p.position, '"', '\"'), '",',
+                          '"medicalCertificate":"', REPLACE(p.medicalCertificate, '"', '\"'), '"}'
+                        )
+                      )
+                      FROM players p 
+                      WHERE p.teamEventId = te.teamEventId
+                    ),
+                    ''
+                  ),
+                ']}'
+              )
+            ) AS participatingTeams
+          FROM sports_events se
+          LEFT JOIN sports s ON se.sportsId = s.sportsId
+          LEFT JOIN teams_events te ON se.sportEventsId = te.sportEventsId
+          LEFT JOIN teams t ON te.teamId = t.teamId
+          WHERE se.eventsId = ?
+          GROUP BY se.sportEventsId;
+          `,
+          [event.eventId] // Pass the current event ID dynamically
         );
-
-        const parsedSportsEvents = sportsEvents.map((event) => ({
-          ...event,
-          participatingTeams: event.participatingTeams
-            ? JSON.parse(`[${event.participatingTeams}]`)
+      
+        console.log('eventId', idx, event.eventId);
+      
+        const parsedSportsEvents = sportsEvents.map((sportEvent) => ({
+          ...sportEvent,
+          participatingTeams: sportEvent.participatingTeams
+            ? JSON.parse(`[${sportEvent.participatingTeams}]`)
             : [],
         }));
-
+      
         const matchPromises = parsedSportsEvents.map(async (sportEvent) => {
           const matches = await queryAsync(
             `
@@ -184,12 +186,13 @@ GROUP BY se.sportEventsId;
             `,
             [sportEvent.sportEventsId]
           );
-
+      
           return { ...sportEvent, matches };
         });
-
+      
         return Promise.all(matchPromises);
       });
+      
 
       const enrichedEvents = await Promise.all(eventPromises);
       const finalEvents = events.map((event, index) => ({
