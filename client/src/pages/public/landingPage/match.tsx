@@ -24,7 +24,6 @@ const MatchSection: React.FC<{
   teams: any;
 }> = ({ matches, event, setSelectedSport, selectedSport, teams }) => {
   const navigate = useNavigate();
-  console.log(event);
   const sports = matches?.map((match: any) => ({
     label: match.sportsName,
     value: match.sportsName,
@@ -39,13 +38,14 @@ const MatchSection: React.FC<{
     if (uniqueSports.length > 0) {
       setSelectedSport(uniqueSports[0]?.value || "");
     }
-  }, [selectedSport]);
+  }, []);
 
   const filteredMatches = matches?.filter(
     (match: any) => match.sportsName === selectedSport
   );
   const filteredTeams = filteredMatches?.[0]?.participatingTeams || [];
-
+  console.log(filteredMatches)
+  console.log(filteredTeams)
   const handleSportChange = (value: string) => {
     setSelectedSport(value);
   };

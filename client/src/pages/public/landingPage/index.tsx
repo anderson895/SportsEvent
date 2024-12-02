@@ -25,7 +25,6 @@ export const LandingPage = () => {
     (event: any) => event.eventId === selectedEventId
   );
 
-  console.log(summary)
   return (
     <div className="bg-gray-100 min-h-screen relative overflow-hidden">
       <HeaderComponents

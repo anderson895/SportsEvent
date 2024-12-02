@@ -218,7 +218,7 @@ module.exports = {
       }
 
       const currentMatch = match[0];
-      const { team1Id, team2Id, next_match_id } = currentMatch;
+      const { team1Id, team2Id, next_match_id,sportEventsId } = currentMatch;
 
       if (team1Score === undefined || team2Score === undefined) {
         return { success: 0, error: "Scores for both teams are required" };
@@ -250,7 +250,7 @@ module.exports = {
           [next_match_id]
         );
 
-        await updateTeamStanding(winnerId, loserId);
+        await updateTeamStanding(winnerId, loserId,sportEventsId);
 
         if (nextMatch.length > 0) {
           const nextMatchRecord = nextMatch[0];
@@ -292,6 +292,7 @@ module.exports = {
         bracketType,
         next_match_id,
         loser_next_match_id,
+        sportEventsId,
         isFinal,
       } = match;
   
@@ -314,7 +315,7 @@ module.exports = {
         [team1Score, team2Score, winnerTeamId, matchId]
       );
   
-      await updateTeamStanding(winnerTeamId, loserTeamId);
+      await updateTeamStanding(winnerTeamId, loserTeamId,sportEventsId);
   
       if (next_match_id) {
         console.log(`Updating winner to next match: ${next_match_id}`);
@@ -364,7 +365,7 @@ module.exports = {
       }
 
       const currentMatch = match[0];
-      const { team1Id, team2Id } = currentMatch;
+      const { team1Id, team2Id,sportEventsId } = currentMatch;
 
       if (team1Score === undefined || team2Score === undefined) {
         return { success: 0, error: "Scores for both teams are required" };
@@ -390,7 +391,7 @@ module.exports = {
         [team1Score, team2Score, winnerId, matchId]
       );
 
-      await updateTeamStanding(winnerId, loserId);
+      await updateTeamStanding(winnerId, loserId,sportEventsId);
 
       return {
         success: 1,
